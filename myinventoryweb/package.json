@@ -8,21 +8,27 @@
     "@testing-library/jest-dom": "^5.11.6",
     "@testing-library/react": "^11.2.2",
     "@testing-library/user-event": "^12.2.2",
-    "@types/jest": "^26.0.15",
+    "@types/jest": "^26.0.16",
     "@types/node": "^14.14.9",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
+    "@types/react-test-renderer": "^17.0.0",
+    "jest": "^26.6.3",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "react-scripts": "4.0.0",
+    "react-test-renderer": "^17.0.1",
+    "ts-jest": "^26.4.4",
     "typescript": "^4.1.2",
     "web-vitals": "^0.2.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "test": "jest",
+    "eject": "react-scripts eject",
+    "uitest": "jest ./src/tests/uitests/*.tsx",
+    "unittest": "jest ./src/tests/unittests/*.ts"
   },
   "eslintConfig": {
     "extends": [
