@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Nav Bar /> title should be set to TestNavBar 1`] = `
+<div
+  className="makeStyles-root-1"
+>
+  <header
+    className="MuiPaper-root MuiAppBar-root MuiAppBar-positionStatic MuiAppBar-colorPrimary makeStyles-background-4 MuiPaper-elevation4"
+  >
+    <div
+      className="MuiToolbar-root MuiToolbar-regular MuiToolbar-gutters"
+    >
+      <h6
+        className="MuiTypography-root makeStyles-title-3 MuiTypography-h6"
+      >
+        TestNavBar
+      </h6>
+    </div>
+  </header>
+</div>
+`;
