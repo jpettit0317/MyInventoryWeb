@@ -5,25 +5,40 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import loginPageStyles from '../componentstyles/loginpagestyles';
+import { withRouter, RouteComponentProps, Link } from 'react-router-dom';
+import LoginPageViewModel from '../viewmodels/LoginPageViewModel';
 
-interface FormData {
-    email: string;
-    password: string;
+interface LoginPageProps extends RouteComponentProps {
+    loginPageViewModel: LoginPageViewModel; 
 }
 
-function LoginPage() {
+const LoginPage: React.FC<LoginPageProps> = props => {
+    const signUpLink: string = "Don't have an account? Sign up!";
     const classes = loginPageStyles();
+    const usernameId: string = "username";
+    const passwordId: string = "password";
+    let loginPageViewModel = props.loginPageViewModel;
 
     function onSubmit() {
 
     }
 
+    function onChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
+        if (event.target.id === usernameId) {
+            const newUsername = event.target.value;
+            loginPageViewModel.setUsername(newUsername);
+        } else if (event.target.id === passwordId) {
+            const newPassword = event.target.value;
+            loginPageViewModel.setPassword(newPassword);
+        }
+        console.log("The props username is " + loginPageViewModel.getUsername());
+        console.log("The props password is " + loginPageViewModel.getPassword());
+    }
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
@@ -40,11 +55,12 @@ function LoginPage() {
                         margin="normal"
                         required
                         fullWidth
-                        id="email"
                         label="Email Address"
                         name="email"
                         autoComplete="email"
                         autoFocus
+                        onChange={onChange}
+                        id={usernameId}
                     />
                     <TextField
                         variant="outlined"
@@ -54,8 +70,9 @@ function LoginPage() {
                         name="password"
                         label="Password"
                         type="password"
-                        id="password"
                         autoComplete="current-password"
+                        onChange={onChange}
+                        id={passwordId}
                     />
                     <FormControlLabel
                         control={<Checkbox value="remember" color="primary" />}
@@ -71,14 +88,9 @@ function LoginPage() {
                         Sign In
                     </Button>
                     <Grid container>
-                        <Grid item xs>
-                            <Link href="#" variant="body2">
-                                Forgot password?
-                            </Link>
-                        </Grid>
                         <Grid item>
-                            <Link href="#" variant="body2">
-                                {"Don't have an account? Sign Up"}
+                            <Link to="/signup">
+                                {signUpLink}
                             </Link>
                         </Grid>
                     </Grid>
@@ -88,4 +100,4 @@ function LoginPage() {
     );
 }
 
-export default LoginPage;
+export default withRouter(LoginPage);
