@@ -12,10 +12,13 @@
     "@types/node": "^14.14.9",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
+    "@types/react-router-dom": "^5.1.6",
     "@types/react-test-renderer": "^17.0.0",
-    "jest": "^26.6.3",
+    "@types/testing-library__jest-dom": "^5.9.5",
+    "jest": "^26.6.0",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
+    "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.0",
     "react-test-renderer": "^17.0.1",
     "ts-jest": "^26.4.4",
@@ -27,8 +30,8 @@
     "build": "react-scripts build",
     "test": "jest",
     "eject": "react-scripts eject",
-    "uitest": "jest ./src/tests/uitests/*.tsx",
-    "unittest": "jest ./src/tests/unittests/*.ts"
+    "uitests": "jest ./src/tests/uitests/*.tsx",
+    "unittests": "jest ./src/tests/unittests/*/*.ts"
   },
   "eslintConfig": {
     "extends": [
