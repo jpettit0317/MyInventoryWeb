@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -12,6 +12,7 @@ import Container from '@material-ui/core/Container';
 import loginPageStyles from '../componentstyles/loginpagestyles';
 import { withRouter, RouteComponentProps, Link } from 'react-router-dom';
 import LoginPageViewModel from '../viewmodels/LoginPageViewModel';
+import UsernameTextField from './UsernameTextField';
 
 interface LoginPageProps extends RouteComponentProps {
     loginPageViewModel: LoginPageViewModel; 
@@ -22,23 +23,124 @@ const LoginPage: React.FC<LoginPageProps> = props => {
     const classes = loginPageStyles();
     const usernameId: string = "username";
     const passwordId: string = "password";
+
     let loginPageViewModel = props.loginPageViewModel;
+    
+    const [errors, setErrors] = useState({usernameError: "", passwordError: ""});
 
     function onSubmit() {
+        const result = loginPageViewModel.reportError();
+        const loginInfo = {username: loginPageViewModel.getUsername(),
+                           password: loginPageViewModel.getPassword()};
 
+        console.log("On submit " + " username: " + loginInfo.username + " password: " + loginInfo.password);
+
+        setErrors(result);
     }
 
     function onChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
+        console.log("Changing");
         if (event.target.id === usernameId) {
             const newUsername = event.target.value;
             loginPageViewModel.setUsername(newUsername);
+            console.log("The new username is " + loginPageViewModel.getUsername());
         } else if (event.target.id === passwordId) {
             const newPassword = event.target.value;
             loginPageViewModel.setPassword(newPassword);
+            console.log("The new password is " + loginPageViewModel.getPassword());
         }
-        console.log("The props username is " + loginPageViewModel.getUsername());
-        console.log("The props password is " + loginPageViewModel.getPassword());
     }
+
+    function renderUsernameTextField(): JSX.Element {
+        if (errors.usernameError === "") {
+            return renderNormalUsernameTextField();
+        } else {
+            return renderErrorUsernameTextField();
+        }
+    }
+
+    function renderNormalUsernameTextField(): JSX.Element {
+        return (
+            <TextField
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                label="Username"
+                name="username"
+                autoFocus
+                onChange={onChange}
+                id={usernameId}
+                // value={loginPageViewModel.getUsername()}
+            />
+        );
+    }
+
+    function renderErrorUsernameTextField(): JSX.Element {
+        return (
+            <TextField
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                label="Username"
+                name="username"
+                autoFocus
+                onChange={onChange}
+                id={usernameId}
+                error
+                helperText="Username must be filled in."
+                // value={loginPageViewModel.getUsername()}
+            />
+        );
+    }
+
+    function renderPasswordTextField(): JSX.Element {
+        if (errors.passwordError === "") {
+            return renderNormalPasswordField();
+        } else {
+            return renderErrorPasswordField();
+        }
+    }
+
+    function renderNormalPasswordField(): JSX.Element {
+        return (
+            <TextField
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                name="password"
+                label="Password"
+                type="password"
+                autoComplete="current-password"
+                onChange={onChange}
+                id={passwordId}
+                // value={loginPageViewModel.getPassword()}
+            />
+        );
+    }
+
+    function renderErrorPasswordField(): JSX.Element {
+        return (
+            <TextField
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                name="password"
+                label="Password"
+                type="password"
+                autoComplete="current-password"
+                onChange={onChange}
+                id={passwordId}
+                error
+                helperText="Password must be filled in."
+                // value={loginPageViewModel.getPassword()}
+            />
+        );
+    }
+
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
@@ -50,40 +152,19 @@ const LoginPage: React.FC<LoginPageProps> = props => {
                     Sign in
                 </Typography>
                 <form className={classes.form} noValidate>
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        label="Email Address"
-                        name="email"
-                        autoComplete="email"
-                        autoFocus
-                        onChange={onChange}
-                        id={usernameId}
-                    />
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        name="password"
-                        label="Password"
-                        type="password"
-                        autoComplete="current-password"
-                        onChange={onChange}
-                        id={passwordId}
-                    />
+                    {renderUsernameTextField()} 
+                    {renderPasswordTextField()} 
                     <FormControlLabel
                         control={<Checkbox value="remember" color="primary" />}
                         label="Remember me"
                     />
                     <Button
-                        type="submit"
+                        type="button"
                         fullWidth
                         variant="contained"
                         color="primary"
                         className={classes.submit}
+                        onClick={onSubmit}
                     >
                         Sign In
                     </Button>

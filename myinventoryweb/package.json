@@ -30,7 +30,7 @@
     "build": "react-scripts build",
     "test": "jest",
     "eject": "react-scripts eject",
-    "uitests": "jest ./src/tests/uitests/*.tsx",
+    "uitests": "jest --env=jsdom ./src/tests/uitests/*.tsx",
     "unittests": "jest ./src/tests/unittests/*/*.ts"
   },
   "eslintConfig": {

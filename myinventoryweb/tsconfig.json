@@ -10,7 +10,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "outDir": "public/js",
     "rootDir": "src",
     "lib": [
@@ -21,7 +21,10 @@
     "allowJs": true,
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
-    "types": ["node", "jest"]
+    "types": [
+      "node",
+      "jest"
+    ]
   },
   "include": [
     "src"

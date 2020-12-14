@@ -75,4 +75,13 @@ describe("LoginPageViewModel tests", () => {
         expect(actualError.usernameError).toBe("");
         expect(actualError.passwordError).toBe(loginPageViewModel.emptyPasswordError); 
     });
+
+    it('reportError should return two errors if there is nothing in username or password', () => {
+        const loginPageViewModel = LoginPageViewModel.createLoginPageViewModel();
+        
+        const actualError = loginPageViewModel.reportError();
+
+        expect(actualError.usernameError).toBe(loginPageViewModel.emptyUsernameError);
+        expect(actualError.passwordError).toBe(loginPageViewModel.emptyPasswordError);
+    });
 });
