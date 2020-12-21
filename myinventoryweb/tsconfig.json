@@ -11,7 +11,8 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "outDir": "public/js",
+    "outDir": "./out",
+    "sourceMap": true,
     "rootDir": "src",
     "lib": [
       "dom",

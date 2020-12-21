@@ -28,16 +28,12 @@ class LoginPageViewModel extends LoginViewModel {
     public reportError(): {usernameError: string, passwordError: string} {
         let userNameError: string = "";
         let passwordError: string = "";
-        console.log("In report error the password is " + this.getPassword());
         if (this.getUsername() === "") {
             userNameError = this.emptyUsernameError;
         } 
         if (this.getPassword() === "") {
-            console.log("Changing password error.");
             passwordError = this.emptyPasswordError
         }
-        console.log("From view model: username: " + userNameError);
-        console.log("Password error: " + passwordError);
         return {usernameError: userNameError, passwordError: passwordError};
     }
 }

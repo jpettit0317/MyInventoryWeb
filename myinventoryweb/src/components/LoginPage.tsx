@@ -12,7 +12,6 @@ import Container from '@material-ui/core/Container';
 import loginPageStyles from '../componentstyles/loginpagestyles';
 import { withRouter, RouteComponentProps, Link } from 'react-router-dom';
 import LoginPageViewModel from '../viewmodels/LoginPageViewModel';
-import UsernameTextField from './UsernameTextField';
 
 interface LoginPageProps extends RouteComponentProps {
     loginPageViewModel: LoginPageViewModel; 
