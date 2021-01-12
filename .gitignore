@@ -5,6 +5,8 @@ myinventoryweb/node_modules
 #/.pnp
 #.pnp.js
 
+myinventoryweb/.env
+myinventoryweb/build
 # testing
 #/coverage
 

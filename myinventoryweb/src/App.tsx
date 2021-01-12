@@ -7,10 +7,17 @@ import { Route, Switch, BrowserRouter, Link, RouteComponentProps } from 'react-r
 import SignUpPageViewModel from "./viewmodels/SignUpPageViewModel";
 import LoginPageViewModel from "./viewmodels/LoginPageViewModel";
 import RoutePath from "./enums/RoutePath_enum";
+import SignUpNetworkCallManager from "./utils/SignUpNetworkCallManager";
+import FullApiURL from "./enums/FullApiURL_enum";
 
 function App() {
   const loginPageViewModel = LoginPageViewModel.createLoginPageViewModel("", "");  
-  const signUpPageViewModel = SignUpPageViewModel.createEmptyViewModel();
+  const signUpPageViewModel = createSignUpPageViewModel(FullApiURL.createUser);
+
+  function createSignUpPageViewModel(urlString: string = "") : SignUpPageViewModel {
+    const newNetworkCallManager = SignUpNetworkCallManager.createNetworkManager(urlString);
+    return SignUpPageViewModel.createEmptyViewModel(newNetworkCallManager);
+  }
 
   return (
     <div>

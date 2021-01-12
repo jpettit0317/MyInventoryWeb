@@ -1,5 +1,6 @@
-import SignUpPageViewModel, { FullName, SignUpViewErrors, SignUpViewModelProps } from '../../../viewmodels/SignUpPageViewModel';
-import * as TestUtils from "../../utils/SignUpPageViewModelTestUtils";
+import SignUpPageViewModel from '../../../viewmodels/SignUpPageViewModel';
+import * as TestUtils from "../../testutils/SignUpPageViewModelTestUtils";
+import SignUpViewErrors from "../../../typeDefs/SignUpViewErrors";
 
 describe('SignUpPageViewModel tests', () => {
     describe('Constructor tests', () => {
@@ -165,6 +166,30 @@ describe('SignUpPageViewModel tests', () => {
             const actualErrors = sut.reportError();
 
             TestUtils.verifyError(actualErrors, noPasswordMatchErrors);
+        });
+    });
+
+    describe('Are there errors tests', () => {
+        it('when there are no errors areThereErrors should return false', () => {
+            const networkManager = TestUtils.MockSignUpNetworkCallManager.createMock("", "");
+            const sut = TestUtils.createSignUpPageViewModel(TestUtils.validProps, networkManager);
+
+            const errors = sut.reportError();
+
+            const result = sut.areThereErrors(errors);
+
+            TestUtils.verifyAreThereErrors([result, false]); 
+        });
+
+        it('when there are errors, areThereErrors should return true', () => {
+            const networkManager = TestUtils.MockSignUpNetworkCallManager.createMock("", "");
+            const sut = TestUtils.createSignUpPageViewModel(TestUtils.emptyProps, networkManager);
+
+            const errors = sut.reportError();
+
+            const result = sut.areThereErrors(errors);
+
+            TestUtils.verifyAreThereErrors([result, true]);
         });
     });
 });

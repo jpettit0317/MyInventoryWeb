@@ -1,4 +1,9 @@
-import SignUpPageViewModel, { SignUpViewErrors, SignUpViewModelProps, Passwords, FullName } from "../../viewmodels/SignUpPageViewModel";
+import SignUpPageViewModel from "../../viewmodels/SignUpPageViewModel";
+import SignUpNetworkCallManager from "../../utils/SignUpNetworkCallManager";
+import SignUpViewErrors from "../../typeDefs/SignUpViewErrors";
+import FullName from "../../typeDefs/FullName";
+import SignUpViewModelProps from "../../typeDefs/SignUpViewModelProps";
+import Passwords from "../../typeDefs/Passwords";
 
 const validEmail = "email@email.com";
 const validUsername = "username";
@@ -95,12 +100,13 @@ export const emptyFieldError: SignUpViewErrors = {
 
 export const nonMatchingPasswordsError = "Confirm password doesn't match password."; 
 
-export function createSignUpPageViewModel(props: SignUpViewModelProps): SignUpPageViewModel {
-    return SignUpPageViewModel.createViewModel(props);
+export function createSignUpPageViewModel(props: SignUpViewModelProps,
+    networkCallManager: SignUpNetworkCallManager = SignUpNetworkCallManager.createNetworkManager("")): SignUpPageViewModel {
+    return SignUpPageViewModel.createViewModel(props, networkCallManager);
 }
 
-export function createEmptySignUpPageViewModel(): SignUpPageViewModel {
-    return SignUpPageViewModel.createEmptyViewModel();
+export function createEmptySignUpPageViewModel(networkCallManager: SignUpNetworkCallManager = SignUpNetworkCallManager.createNetworkManager("")): SignUpPageViewModel {
+    return SignUpPageViewModel.createEmptyViewModel(networkCallManager);
 }
 
 export function verifyViewModelIsEqualToProps(viewModel: SignUpPageViewModel, props: SignUpViewModelProps) {
@@ -151,6 +157,12 @@ export function verifyPasswordError(passwordErrors: {passwordError: string, conf
     expect(actualError.confirmedPasswordError).toBe(expectedError.confirmedPasswordError);
 }
 
+export function verifyAreThereErrors(results: boolean[]) {
+    const [actualResult, expectedResult] = results;
+
+    expect(actualResult).toBe(expectedResult);
+}
+
 export function printProps(props: SignUpViewModelProps) {
     console.log(`Username: ${props.username}`);
     console.log(`FirstName: ${props.fullName.firstName}, Lastname: ${props.fullName.lastName}`);
@@ -165,4 +177,39 @@ export function printError(error: SignUpViewErrors) {
     console.log(`Email error: ${error.emailError}`);
     console.log(`Password error: ${error.passwordErrors.passwordError}`);
     console.log(`Confirmed Password Error : ${error.passwordErrors.confirmedPasswordError}`);
+}
+
+export function verifyNetworkError(actualError: string, expectedError: string) {
+    const expected = "{ " + expectedError + " }";
+    expect(actualError).toBe(expected);
+}
+
+export const userNameTakenError = "Username taken";
+export class MockSignUpNetworkCallManager extends SignUpNetworkCallManager {
+    readonly error: string;
+
+    private constructor(newError: string = "", newUrl: string = "") {
+        super(newUrl);
+        this.error = newError;
+    }
+
+    static createMock(newError: string = "", newUrl: string = ""): MockSignUpNetworkCallManager {
+        return new MockSignUpNetworkCallManager(newError, newUrl);
+    }
+
+    async sendCreateUserRequest(user: {
+        username: string,
+        password: string,
+        email: string,
+        firstName: string,
+        lastName: string
+    }): Promise<string> {
+        if (this.error === "") {
+            return "";
+        } else if(this.error === userNameTakenError) {
+            return userNameTakenError;
+        }  else {
+            return "";
+        }
+    }
 }

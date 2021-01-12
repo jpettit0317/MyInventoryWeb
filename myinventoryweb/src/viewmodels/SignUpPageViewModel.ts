@@ -1,27 +1,8 @@
-export type FullName = {
-    firstName: string,
-    lastName: string
-};
-
-export type Passwords = {
-    password: string,
-    confirmedPassword: string
-};
-
-export type SignUpViewErrors = {
-    usernameError: string,
-    fullNameErrors: {firstNameError: string, lastNameError: string},
-    passwordErrors: {passwordError: string, confirmedPasswordError: string}
-    emailError: string,
-};
-
-export type SignUpViewModelProps = {
-    username: string,
-    passwords: Passwords,
-    email: string,
-    fullName: FullName
-};
-
+import SignUpNetworkCallManager from "../utils/SignUpNetworkCallManager";
+import FullName from '../typeDefs/FullName';
+import Passwords from '../typeDefs/Passwords';
+import SignUpViewErrors from '../typeDefs/SignUpViewErrors';
+import SignUpViewModelProps from '../typeDefs/SignUpViewModelProps';
 export abstract class SignUpViewModel {
     private username: string;
     private fullname: FullName;
@@ -62,7 +43,7 @@ export abstract class SignUpViewModel {
     }
 }
 
-class SignUpPageViewModel extends SignUpViewModel {
+export default class SignUpPageViewModel extends SignUpViewModel {
     readonly emptyFieldErrors = {
         usernameError: "Username should be filled in.",
         passwordError: "Password should be filled in.",
@@ -74,22 +55,31 @@ class SignUpPageViewModel extends SignUpViewModel {
 
     readonly confirmPasswordNoMatch = "Confirm password doesn't match password.";
 
+    readonly signUpNetworkCallManager: SignUpNetworkCallManager;
+
     private constructor(props: SignUpViewModelProps = {
         username: "", passwords: { password: "", confirmedPassword: "" },
         email: "", fullName: { firstName: "", lastName: "" }
-    }) {
+    }, newNetworkCallManager: SignUpNetworkCallManager) {
         super(props);
+        this.signUpNetworkCallManager = newNetworkCallManager;
     }
 
     static createViewModel(signUpProps: SignUpViewModelProps = {
         username: "", passwords: { password: "", confirmedPassword: "" },
         email: "", fullName: { firstName: "", lastName: "" }
-    }): SignUpPageViewModel {
-        return new SignUpPageViewModel(signUpProps);
+    }, newNetworkCallManager: SignUpNetworkCallManager): SignUpPageViewModel {
+        return new SignUpPageViewModel(signUpProps, newNetworkCallManager);
     }
 
-    static createEmptyViewModel(): SignUpPageViewModel {
-        return new SignUpPageViewModel();
+    static createEmptyViewModel(newNetworkCallManager: SignUpNetworkCallManager): SignUpPageViewModel {
+        const emptyProps = {
+            username: "",
+            passwords: {password: "", confirmedPassword: ""},
+            email: "",
+            fullName: {firstName: "", lastName: ""}
+        };
+        return new SignUpPageViewModel(emptyProps, newNetworkCallManager);
     }
 
     reportError(): SignUpViewErrors {
@@ -140,6 +130,35 @@ class SignUpPageViewModel extends SignUpViewModel {
     private reportEmailError(): string {
         return this.getEmailAddress() === "" ? this.emptyFieldErrors.emailError : "";
     }
-}
 
-export default SignUpPageViewModel;
+    sendCreateUserInfo(): Promise<string> {
+        const user = {
+            username: this.getUsername(),
+            password: this.getPassword(),
+            email: this.getEmailAddress(),
+            firstName: this.getFirstName(),
+            lastName: this.getLastName()
+        };
+        
+        return this.signUpNetworkCallManager.sendCreateUserRequest(user);
+    }
+
+    getUserInfo() : {username: string, password: string, email: string, firstName: string, lastName: string} {
+        return {
+            username: this.getUsername(),
+            password: this.getPassword(),
+            email: this.getEmailAddress(),
+            firstName: this.getFirstName(),
+            lastName: this.getLastName()
+        };
+    }
+
+    areThereErrors(errors: SignUpViewErrors) : boolean {
+        return errors.emailError !== "" 
+           && errors.usernameError !== "" 
+           && errors.fullNameErrors.firstNameError !== "" 
+           && errors.fullNameErrors.lastNameError !== "" 
+           && errors.passwordErrors.confirmedPasswordError !== "" 
+           && errors.passwordErrors.passwordError !== "";
+    }
+}

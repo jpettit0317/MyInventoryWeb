@@ -14,6 +14,8 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import Alert from '@material-ui/lab/Alert';
+import SignUpViewErrors from '../typeDefs/SignUpViewErrors';
 
 function Copyright() {
     return (
@@ -79,18 +81,28 @@ const SignUpPage: React.FC<SignUpPageProps> = props => {
 
     function onClick() {
         console.log("Sign up clicked.");
-        updateErrors();
+
+        const currentErrors = props.signUpPageViewModel.reportError();
+        updateErrors(currentErrors);
+        const userInfo = props.signUpPageViewModel.getUserInfo();
+        
+        props.signUpPageViewModel.signUpNetworkCallManager.sendCreateUserRequest(userInfo)
+        .then((result) => {
+            console.log("No error found");
+        })
+        .catch((error) => {
+            const errorValue = String(error).replace(/"/g, "");
+            setUsernameError(errorValue);
+        });
     }
 
-    function updateErrors() {
-        const currentErrors = props.signUpPageViewModel.reportError();
-
-        setFirstNameError(currentErrors.fullNameErrors.firstNameError);
-        setLastNameError(currentErrors.fullNameErrors.lastNameError);
-        setUsernameError(currentErrors.usernameError);
-        setEmailError(currentErrors.emailError);
-        setPasswordError(currentErrors.passwordErrors.passwordError);
-        setConfirmedPasswordError(currentErrors.passwordErrors.confirmedPasswordError);
+    function updateErrors(errors: SignUpViewErrors) {
+        setFirstNameError(errors.fullNameErrors.firstNameError);
+        setLastNameError(errors.fullNameErrors.lastNameError);
+        setUsernameError(errors.usernameError);
+        setEmailError(errors.emailError);
+        setPasswordError(errors.passwordErrors.passwordError);
+        setConfirmedPasswordError(errors.passwordErrors.confirmedPasswordError);
     }
 
     function onChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
