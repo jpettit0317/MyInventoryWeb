@@ -1,6 +1,5 @@
 import { UserService } from "../../services/UserService";
 import { 
-    deleteUsersByUsername, 
     testInfo, 
     connectionString,
     johnInfo,
@@ -8,7 +7,8 @@ import {
     johnSignUpInfo,
     verifyCreateUser,
     getUserNameAndPasswordFromInfo,
-    emptySignUpInfo
+    emptySignUpInfo,
+    userServiceTestCollection,
 } from "../testutils/UserServiceTestUtils";
 import mongoose from "mongoose";
 import IUserInfo from "../../interfaces/modelinterfaces/UserInfo";
@@ -27,7 +27,7 @@ describe("UserService tests", () => {
             done.fail(err);
         });
 
-        TestUsers = (await testUserConnection).model<IUserInfo>("TestUsers", userInfoSchema, "userServiceTests");
+        TestUsers = (await testUserConnection).model<IUserInfo>("TestUsers", userInfoSchema, userServiceTestCollection);
         await TestUsers.insertMany([
             {
                 email: testInfo.email,
@@ -46,7 +46,16 @@ describe("UserService tests", () => {
     });
 
     afterAll( async (done: jest.DoneCallback) => {
-        deleteUsersByUsername(TestUsers, done);
+        (await testUserConnection).db.dropCollection(userServiceTestCollection).then( (result) => {
+            if (!result) {
+                done.fail(`Couldn't drop collection named ${userServiceTestCollection}`);
+            }
+        }, (rejectionReason) => {
+            done.fail(`Couldn't drop collection named ${userServiceTestCollection} because: ${String(rejectionReason)}`);
+        });
+        (await testUserConnection).close().then( () => {
+            console.log("Connection closed");
+        })
     });
 
     describe("doesUserExist tests", function () {

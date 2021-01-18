@@ -4,6 +4,8 @@ import UserSignUpInfo from '../../interfaces/modelinterfaces/UserSignUpInfo';
 import { UserService } from '../../services/UserService';
 
 export const connectionString = "mongodb://localhost:27017/userServiceTests";
+export const userServiceTestCollection = "userServiceTests";
+export const collectionSuccessfullyDropped: string = "Collection dropped.";
 
 export const testInfo: UserSignUpInfo = {
     email: "email@email.com",
@@ -46,18 +48,6 @@ export function getUserNameAndPasswordFromInfo(usersignUpInfo: UserSignUpInfo, m
     return {result: {username: usersignUpInfo.username, password: usersignUpInfo.password}, message: message};
 }
 
-export async function createConnection(connectionURI: string): Promise<mongoose.Connection> {
-    return mongoose.createConnection(connectionURI);
-}
-
-export function deleteUsersByUsername(testUserDB: mongoose.Model<IUserInfo>, done: jest.DoneCallback) {
-    testUserDB.deleteMany({ username: testInfo.username }, undefined, undefined).then((value) => {
-        testUserDB.deleteMany({ username: johnSignUpInfo.username }, undefined, undefined).then((value) => {
-            done();
-        });
-    });
-}
-
 export function verifyDoesUserExistResult(expected: {result: boolean, message: string}, actual: {result: boolean, message: string}) {
     expect(actual.result).toBe(expected.result);
     expect(actual.message).toBe(expected.message);
@@ -78,4 +68,39 @@ export function verifyRetrievedUser(results: UserSignUpInfo[]) {
     expect(actualUser.firstName).toBe(expectedUser.firstName);
     expect(actualUser.lastName).toBe(expectedUser.lastName);
     expect(actualUser.email).toBe(expectedUser.email);
+}
+
+export async function closeConnection(connection: mongoose.Connection): Promise<string> {
+    let connectionClosedMessage: string = collectionSuccessfullyDropped;
+
+    await connection.close().catch((rejctionReason) => {
+        console.log("Couldn't close connection because: " + String(rejctionReason));
+        connectionClosedMessage = String(rejctionReason);
+    });
+
+    return new Promise((resolve, reject) => {
+        if (connectionClosedMessage !== collectionSuccessfullyDropped) {
+            resolve(connectionClosedMessage);
+        } else {
+            reject(connectionClosedMessage);
+        }
+    });
+}
+
+export async function dropUserCollection(connection: mongoose.Connection, collectionName: string = userServiceTestCollection): Promise<string> {
+    let closedMessage: string = "";
+
+    await connection.db.dropCollection(collectionName).then(() => {
+        closedMessage = collectionSuccessfullyDropped;
+    }, (rejectionReason) => {
+        closedMessage = String(rejectionReason);
+    });
+
+    return new Promise((resolve, reject) => {
+        if (closedMessage === collectionSuccessfullyDropped) {
+            resolve(closedMessage);
+        } else {
+            reject(closedMessage);
+        }
+    });
 }
