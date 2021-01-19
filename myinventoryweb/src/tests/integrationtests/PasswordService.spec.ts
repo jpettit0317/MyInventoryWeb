@@ -3,11 +3,12 @@ import { Model, Connection, createConnection } from "mongoose";
 import UserPasswordInfo from "../../interfaces/modelinterfaces/UserPasswordInfo";
 import IPasswordInfo from "../../interfaces/modelinterfaces/IPasswordInfo";
 import {
-    testDataPasswordInfo,
+    logins,
     testPasswordDB,
     closeConnection,
     dropPasswordCollection,
-    verifyCreateUserPassword
+    verifyCreateUserPassword,
+    verifyValidateUser
 } from "../testutils/PasswordServiceTestUtils";
 import userPasswordSchema from "../../models/dbModels/UserPasswordSchema";
 
@@ -56,7 +57,7 @@ describe('PasswordService tests', () => {
     describe('createUserPasswordEntry tests', () => {
         it("when a user doesn't exist, createUserPasswordEntry should return true and the message should be blank",
             async (done: jest.DoneCallback) => {
-              await sut.createUserPasswordEntry(testDataPasswordInfo.testInfo).then( (result: {result: boolean, message: string}) => {
+              await sut.createUserPasswordEntry(logins.testInfo).then( (result: {result: boolean, message: string}) => {
                   const expectedResult = {result: true, message: ""};
                   verifyCreateUserPassword([result, expectedResult]); 
                   done();
@@ -66,12 +67,47 @@ describe('PasswordService tests', () => {
         });
 
         it("when a user does exist, createUserPasswordEntry should return false and the message should be User exists", async (done: jest.DoneCallback) => {
-            await sut.createUserPasswordEntry(testDataPasswordInfo.testInfo).then( (result: {result: boolean, message: string}) => {
+            await sut.createUserPasswordEntry(logins.testInfo).then( (result: {result: boolean, message: string}) => {
                 done.fail(result.message);
             }).catch((reasonForRejection: {result: boolean, message: string}) => {
                 const expectedResult = {result: false, message: "User exists"};
                 verifyCreateUserPassword([reasonForRejection, expectedResult]);
                 done();
+            });
+        });
+    });
+
+    describe('validateUserLogin tests', () => {
+        it("when a user does exist and provides the correct password, validateUserLogin should return true", async (done: jest.DoneCallback) => {
+            const expectedResult = {result: true, reason: ""};
+
+            await sut.validateUserLogin(logins.testInfo).then((actualResult: {result: boolean, reason: string}) => {
+                verifyValidateUser([actualResult, expectedResult]);
+                done();
+            }).catch(() => {
+                done.fail("Validation failed.");
+            });
+        });
+        
+        it("when a user does exist and provides an incorrect password, validateUserLogin should return false", async (done: jest.DoneCallback) => {
+            const expectedResult = {result: false, reason: "Passwords don't match"};
+
+            await sut.validateUserLogin(logins.badTestInfo).then((actualResult: {result: boolean, reason: string}) => {
+                verifyValidateUser([actualResult, expectedResult]);
+                done();
+            }).catch( () => {
+                done.fail("Validation failed.");
+            });
+        });
+
+        it("when a user doesn't exist, validateUserLogin should return false", async(done: jest.DoneCallback) => {
+            const expectedResult = {result: false, reason: "User doesn't exist"};
+
+            await sut.validateUserLogin(logins.jonInfo).then((actualResult: {result: boolean, reason: string}) => {
+                verifyValidateUser([actualResult, expectedResult]);
+                done();
+            }).catch(() => {
+                done.fail("Validation failed.");
             });
         });
     });

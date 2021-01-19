@@ -12,14 +12,12 @@ export const testPasswordDB = {
     refName: "TestPasswords"
 };
 
-export const testDataPasswordInfo: {testInfo: UserPasswordInfo, jonInfo: UserPasswordInfo} = {
+export const logins: {testInfo: UserPasswordInfo, 
+    jonInfo: UserPasswordInfo, badTestInfo: UserPasswordInfo} = {
     testInfo: {username: "test", password: "password"},
     jonInfo: {username: "jondoe", password: "password"},
+    badTestInfo: {username: "test", password: "password2"}
 };
-
-export function insertPasswordIntoDB(passwordModel: mongoose.Model<IPasswordInfo>, info: UserPasswordInfo) {
-    console.log(`Inserting Username: ${info.username}, Password: ${info.password} into the database.`);
-}
 
 export function verifyUserPasswordInfo(passwordInfos: UserPasswordInfo[]) {
     const [actualInfo, expectedInfo] = passwordInfos;
@@ -33,6 +31,13 @@ export function verifyCreateUserPassword(results: {result: boolean, message: str
 
     expect(actualInfo.message).toBe(expectedInfo.message);
     expect(actualInfo.result).toBe(expectedInfo.result);
+}
+
+export function verifyValidateUser(results: {result: boolean, reason: string}[]) {
+    const [actualInfo, expectedInfo] = results;
+
+    expect(actualInfo.result).toBe(expectedInfo.result);
+    expect(actualInfo.reason).toBe(expectedInfo.reason);
 }
 
 export async function closeConnection(connection: mongoose.Connection): Promise<boolean> {
