@@ -1,4 +1,3 @@
-import { DBUser } from "../models/dbModels/DBUser";
 import { Model } from "mongoose";
 import UserSignUpInfo from "../interfaces/modelinterfaces/UserSignUpInfo";
 import IUserInfo from "../interfaces/modelinterfaces/UserInfo";
@@ -9,7 +8,7 @@ export class UserService {
     private userDB: Model<IUserInfo>
     readonly usernameExistsMessage: string = "Username exists";
 
-    private constructor(newUserDB: Model<IUserInfo>) {
+    protected constructor(newUserDB: Model<IUserInfo>) {
         this.userDB = newUserDB;
     }
 
@@ -67,6 +66,7 @@ export class UserService {
 
         await this.saveUserToUserDatabase(userInfoProvided).then( (result) => {
             if (result.userInfo === null) {
+                console.log("Username " + userInfoProvided.username + " exists");
                 userSaveResult.message = result.message;
             } else {
                 userSaveResult.result = {username: result.userInfo.username, password: result.userInfo.password};

@@ -1,14 +1,20 @@
 import ApiURL from "./enums/ApiURL_enum";
 import express from "express";
-import { json } from "body-parser";
-import mongoose from "mongoose";
-import session from 'express-session';
-import MongoStore from 'connect-mongo';
 require('dotenv').config();
-import { DBUser } from './models/dbModels/DBUser';
-import userInfoSchema from './models/dbModels/UserInfoSchema';
+import { createUserConnection, closeUserConnection } from './models/dbModels/DBUser';
+import UserSignUpInfo from './interfaces/modelinterfaces/UserSignUpInfo';
+import {
+    portNumber,
+    createSignUpController
+} from "./utils/serverHelper";
+import SignUpController from "./controllers/SignUpController";
+import { Connection } from "mongoose";
+import { createPasswordConnection } from "./utils/PasswordServiceUtils";
 
 const app = express();
+
+let userConnection: Connection;
+let passwordConnection: Connection;
 
 app.use(express.urlencoded({
     extended: true
@@ -16,56 +22,40 @@ app.use(express.urlencoded({
 
 app.use(express.json());
 
-const passwordSchema = new mongoose.Schema({
-    username: String,
-    password: String,
-    salt: String
-});
-
-const sessionSchema = new mongoose.Schema({
-    expirationDate: Date,
-    sessionId: String,
-    username: String
-});
-
-const portNumber = 4000;
-
 app.listen(portNumber, () => {
     console.log("Listening on port " + portNumber);
+    userConnection = createUserConnection();
+    passwordConnection = createPasswordConnection();
 });
 
-app.post(ApiURL.createUser, (req, res) => {
+app.post(ApiURL.createUser, async (req, res) => {
     console.log(`Hello from ${ApiURL.createUser}`);
-    const userInfo = {
-        username: req.body.username,
-        password: req.body.password,
-        email: req.body.email,
-        fullName: {
-            firstName: req.body.firstName,
-            lastName: req.body.lastName
-        }
+    const userSignUpInfo: UserSignUpInfo = {
+        username: String(req.body.username),
+        password: String(req.body.password),
+        email: String(req.body.email),
+        firstName: String(req.body.firstName),
+        lastName: String(req.body.lastName),
+        userId: ""
     };
 
-    findUser();
-    
-    logUserInfo(userInfo);
-    res.send("Username already exists");
+    const signUpController = createSignUpController(userSignUpInfo, userConnection, passwordConnection);
+
+    signUpController.createUser(userSignUpInfo).then( (result) => {
+        console.log(`In then block sending ${result.message}`);
+        res.send(result.message);
+    }).catch( (reason: {result: boolean, message: string}) => {
+        console.log(`In catch block sending ${reason.message}`);
+        res.send(reason.message);
+    });
+    logUserInfo(userSignUpInfo);
 });
 
-function logUserInfo(userInfo: {username: string, password: string, email: string, fullName: {firstName: string, lastName: string}}) {
+function logUserInfo(userInfo: UserSignUpInfo) {
     console.log(`Uname: ${userInfo.username}`);
     console.log(`Pswd: ${userInfo.password}`);
     console.log(`Email: ${userInfo.email}`);
-    console.log(`Firstname: ${userInfo.fullName.firstName}`);
-    console.log(`Lastname: ${userInfo.fullName.lastName}`);
+    console.log(`Firstname: ${userInfo.firstName}`);
+    console.log(`Lastname: ${userInfo.lastName}`);
 }
 
-async function findUser() {
-    const user = await DBUser.find();
-
-    if (user.length == 0) {
-        console.log("User doesn't exist");
-    } else {
-        console.log("User " + user[0]);
-    }
-}
