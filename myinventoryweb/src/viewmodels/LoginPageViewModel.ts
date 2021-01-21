@@ -1,3 +1,4 @@
+import UserPasswordInfo from "../interfaces/modelinterfaces/UserPasswordInfo";
 import LoginNetworkCallManager from "../utils/LoginNetworkCallManager";
 
 abstract class LoginViewModel {
@@ -39,6 +40,15 @@ class LoginPageViewModel extends LoginViewModel {
             passwordError = this.emptyPasswordError
         }
         return {usernameError: userNameError, passwordError: passwordError};
+    }
+
+    private getUserLoginInfo(): UserPasswordInfo {
+        const info: UserPasswordInfo = {
+            username: this.getUsername(),
+            password: this.getPassword()
+        };
+
+        return info;
     }
 }
 
