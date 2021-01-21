@@ -1,3 +1,5 @@
+import LoginNetworkCallManager from "../utils/LoginNetworkCallManager";
+
 abstract class LoginViewModel {
     private password: string;
     private username: string;
@@ -15,14 +17,16 @@ abstract class LoginViewModel {
 class LoginPageViewModel extends LoginViewModel {
     readonly emptyUsernameError = "Username should be filled in.";
     readonly emptyPasswordError = "Password should be filled in.";
+    private loginNetworkCallManager: LoginNetworkCallManager;
 
-    constructor(password: string = "", username: string = "") {
+    constructor(password: string = "", username: string = "", loginNetworkCallManager: LoginNetworkCallManager) {
         super(username, password);
+        this.loginNetworkCallManager = loginNetworkCallManager;
     }
 
     static createLoginPageViewModel(username: string =
-        "", password: string = ""): LoginPageViewModel {
-        return new LoginPageViewModel(password, username);
+        "", password: string = "", loginNetworkCallManager: LoginNetworkCallManager): LoginPageViewModel {
+        return new LoginPageViewModel(password, username, loginNetworkCallManager);
     }
 
     public reportError(): {usernameError: string, passwordError: string} {
