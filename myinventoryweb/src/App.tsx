@@ -9,9 +9,11 @@ import LoginPageViewModel from "./viewmodels/LoginPageViewModel";
 import RoutePath from "./enums/RoutePath_enum";
 import SignUpNetworkCallManager from "./utils/SignUpNetworkCallManager";
 import FullApiURL from "./enums/FullApiURL_enum";
+import LoginNetworkCallManager from './utils/LoginNetworkCallManager';
 
 function App() {
-  const loginPageViewModel = LoginPageViewModel.createLoginPageViewModel("", "");  
+  const loginNetworkCallManager = LoginNetworkCallManager.createLoginNetworkCallManager(FullApiURL.verifyUser);
+  const loginPageViewModel = LoginPageViewModel.createLoginPageViewModel("", "", loginNetworkCallManager);  
   const signUpPageViewModel = createSignUpPageViewModel(FullApiURL.createUser);
 
   function createSignUpPageViewModel(urlString: string = "") : SignUpPageViewModel {
