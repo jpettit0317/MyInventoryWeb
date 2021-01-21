@@ -48,7 +48,6 @@ app.post(ApiURL.createUser, async (req, res) => {
         console.log(`In catch block sending ${reason.message}`);
         res.send(reason.message);
     });
-    logUserInfo(userSignUpInfo);
 });
 
 function logUserInfo(userInfo: UserSignUpInfo) {
