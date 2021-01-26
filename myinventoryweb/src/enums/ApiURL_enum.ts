@@ -1,6 +1,6 @@
 enum ApiURL {
     createUser="/api/createUser",
-    verifyLogin="/api/verifyLogin"
+    verifyLogin="/api/verifyUserLogin"
 };
 
 export default ApiURL;

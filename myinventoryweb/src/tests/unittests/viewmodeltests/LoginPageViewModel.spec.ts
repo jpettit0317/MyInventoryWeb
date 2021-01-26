@@ -25,12 +25,12 @@ describe("LoginPageViewModel tests", () => {
             return new MockLoginNetworkCallManager(props);
         }
 
-        sendVerifyUserRequest(loginInfo: UserPasswordInfo): Promise<{result: boolean, message: string}> {
+        sendVerifyUserRequest(loginInfo: UserPasswordInfo): Promise<string> {
             return new Promise( (resolve, reject) => {
                 if (!this.shouldReject) {
-                    resolve({result: this.result, message: this.message});
+                    resolve(this.message);
                 } else {
-                    reject({result: this.result, message: this.message});
+                    reject(this.message);
                 }
             });
         }

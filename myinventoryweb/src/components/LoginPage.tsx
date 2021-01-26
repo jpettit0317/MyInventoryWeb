@@ -27,12 +27,20 @@ const LoginPage: React.FC<LoginPageProps> = props => {
     
     const [errors, setErrors] = useState({usernameError: "", passwordError: ""});
 
-    function onSubmit() {
-        const result = loginPageViewModel.reportError();
+    async function onSubmit() {
+        let result = loginPageViewModel.reportError();
         const loginInfo = {username: loginPageViewModel.getUsername(),
                            password: loginPageViewModel.getPassword()};
 
         console.log("On submit " + " username: " + loginInfo.username + " password: " + loginInfo.password);
+
+        await loginPageViewModel.validateUserLogin().then(() => {
+            console.log("Nothing went wrong");
+        }).catch( (rejectReason: string) => {
+            console.log("Reason for rejction " + rejectReason);
+            result.passwordError = rejectReason;
+            console.log("Setting password error");
+        });
 
         setErrors(result);
     }

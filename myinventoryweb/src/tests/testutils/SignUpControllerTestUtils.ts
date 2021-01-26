@@ -6,6 +6,23 @@ import IUserInfo from "../../interfaces/modelinterfaces/UserInfo";
 import userInfoSchema from "../../models/dbModels/UserInfoSchema";
 import { UserService } from "../../services/UserService";
 import PasswordService from "../../services/PasswordService";
+import UserSignUpInfo from "../../interfaces/modelinterfaces/UserSignUpInfo";
+import UserPasswordInfo from "../../interfaces/modelinterfaces/UserPasswordInfo";
+
+
+export const jonUser: UserSignUpInfo = {
+    username: "jondoe",
+    password: "password",
+    email: "email",
+    firstName: "Jon",
+    lastName: "Doe",
+    userId: ""
+};
+
+export const jonUserLogin: UserPasswordInfo = {
+    username: jonUser.username,
+    password: jonUser.password
+};
 
 export const emptyProps = {
     username: "",

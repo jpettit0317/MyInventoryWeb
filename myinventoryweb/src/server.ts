@@ -10,17 +10,18 @@ import {
 import SignUpController from "./controllers/SignUpController";
 import { Connection } from "mongoose";
 import { createPasswordConnection } from "./utils/PasswordServiceUtils";
+import UserPasswordInfo from "./interfaces/modelinterfaces/UserPasswordInfo";
+import bodyParser from "body-parser";
 
 const app = express();
 
 let userConnection: Connection;
 let passwordConnection: Connection;
 
+app.use(express.json());
 app.use(express.urlencoded({
     extended: true
 }));
-
-app.use(express.json());
 
 app.listen(portNumber, () => {
     console.log("Listening on port " + portNumber);
@@ -50,11 +51,28 @@ app.post(ApiURL.createUser, async (req, res) => {
     });
 });
 
+app.post(ApiURL.verifyLogin, (req, res) => {
+    console.log("Verifying user.");
+
+    console.log("Body as string " + req.body.username);
+    const providedLogin: UserPasswordInfo = {
+        username: String(req.body.username),
+        password: String(req.body.password)
+    };
+
+    logUserLoginInfo(providedLogin);
+    res.send("");
+});
+
 function logUserInfo(userInfo: UserSignUpInfo) {
     console.log(`Uname: ${userInfo.username}`);
     console.log(`Pswd: ${userInfo.password}`);
     console.log(`Email: ${userInfo.email}`);
     console.log(`Firstname: ${userInfo.firstName}`);
     console.log(`Lastname: ${userInfo.lastName}`);
+}
+
+function logUserLoginInfo(userInfo: UserPasswordInfo) {
+    console.log(`Username: ${userInfo.username} Password: ${userInfo.password}`);
 }
 
