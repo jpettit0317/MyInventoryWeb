@@ -11,6 +11,7 @@ import {
     verifyValidateUser
 } from "../testutils/PasswordServiceTestUtils";
 import userPasswordSchema from "../../models/dbModels/UserPasswordSchema";
+import VerifyUserMessages from "../../enums/VerifyUserMessages_enum";
 
 describe('PasswordService tests', () => {
     let testPasswordConnection: Connection;
@@ -70,7 +71,7 @@ describe('PasswordService tests', () => {
             await sut.createUserPasswordEntry(logins.testInfo).then( (result: {result: boolean, message: string}) => {
                 done.fail(result.message);
             }).catch((reasonForRejection: {result: boolean, message: string}) => {
-                const expectedResult = {result: false, message: "User exists"};
+                const expectedResult = {result: false, message: VerifyUserMessages.userDoesExist};
                 verifyCreateUserPassword([reasonForRejection, expectedResult]);
                 done();
             });
@@ -106,8 +107,8 @@ describe('PasswordService tests', () => {
             await sut.validateUserLogin(logins.jonInfo).then((actualResult: {result: boolean, reason: string}) => {
                 verifyValidateUser([actualResult, expectedResult]);
                 done();
-            }).catch(() => {
-                done.fail("Validation failed.");
+            }).catch((reason: {result: boolean, reason: string}) => {
+                done.fail("Validation failed because: " + reason.reason);
             });
         });
     });

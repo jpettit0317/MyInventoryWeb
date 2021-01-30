@@ -16,6 +16,12 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Alert from '@material-ui/lab/Alert';
 import SignUpViewErrors from '../typeDefs/SignUpViewErrors';
+import { ErrorSharp } from "@material-ui/icons";
+import SignUpViewModelProps from "../typeDefs/SignUpViewModelProps";
+import SignUpNetworkCallManager from "../utils/SignUpNetworkCallManager";
+import FullApiURL from "../enums/FullApiURL_enum";
+import NetworkCallManager from "../interfaces/modelinterfaces/NetworkCallManager";
+import { removeDoubleQuotesFromString } from "../utils/StringUtil";
 
 function Copyright() {
     return (
@@ -49,7 +55,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface SignUpPageProps extends RouteComponentProps {
-    signUpPageViewModel: SignUpPageViewModel
+    firstName: string,
+    lastName: string,
+    username: string,
+    email: string,
+    password: string,
+    confirmedPassword: string
 }
 
 const SignUpPage: React.FC<SignUpPageProps> = props => {
@@ -79,20 +90,46 @@ const SignUpPage: React.FC<SignUpPageProps> = props => {
     const [passwordError, setPasswordError] = useState("");
     const [confirmPasswordError, setConfirmedPasswordError] = useState("");
 
-    function onClick() {
-        console.log("Sign up clicked.");
+    const [firstName, setFirstName] = useState(props.firstName);
+    const [lastName, setLastName] = useState(props.lastName);
+    const [username, setUsername] = useState(props.username);
+    const [email, setEmail] = useState(props.email);
+    const [password, setPassword] = useState(props.password);
+    const [confirmedPassword, setConfirmedPassword] = useState(props.confirmedPassword);
 
-        const currentErrors = props.signUpPageViewModel.reportError();
-        updateErrors(currentErrors);
-        const userInfo = props.signUpPageViewModel.getUserInfo();
+    function onClick() {
+        const viewModelProps: SignUpViewModelProps = {
+            username: username,
+            passwords: {password: password, confirmedPassword: confirmedPassword},
+            email: email,
+            fullName: {firstName: firstName, lastName: lastName}
+        };
+        const signUpNetworkCallManager = SignUpNetworkCallManager.createNetworkManager(FullApiURL.createUser);
         
-        props.signUpPageViewModel.signUpNetworkCallManager.sendCreateUserRequest(userInfo)
-        .then((result) => {
+        sendUserSignUpOverNetwork(viewModelProps, signUpNetworkCallManager);
+    }
+
+    function sendUserSignUpOverNetwork(viewModelProps: SignUpViewModelProps, networkCallManager: SignUpNetworkCallManager) {
+        const signUpPageViewModel = SignUpPageViewModel.createViewModel(viewModelProps, networkCallManager);
+        const currentErrors = signUpPageViewModel.reportError();
+        
+        updateErrors(currentErrors);
+
+        if (areThereErrors(currentErrors)) {
+            return;
+        }
+
+        const userInfo = signUpPageViewModel.getUserInfo();
+
+        signUpPageViewModel.signUpNetworkCallManager.sendCreateUserRequest(userInfo).then((result) => {
             console.log("No error found");
-        })
-        .catch((error) => {
-            const errorValue = String(error).replace(/"/g, "");
-            setUsernameError(errorValue);
+        }).catch((error) => {
+            const errorValue = removeDoubleQuotesFromString(String(error));
+            if (errorValue === "Error: Network Error") {
+                alert("There was a network error. Please try again later.");
+            } else {
+                setUsernameError(errorValue);
+            }
         });
     }
 
@@ -103,6 +140,27 @@ const SignUpPage: React.FC<SignUpPageProps> = props => {
         setEmailError(errors.emailError);
         setPasswordError(errors.passwordErrors.passwordError);
         setConfirmedPasswordError(errors.passwordErrors.confirmedPasswordError);
+    }
+
+    function areThereErrors(errors: SignUpViewErrors): boolean {
+        if (areThereFullNameErrors(errors.fullNameErrors)) {
+            return true;
+        } else if (areTherePasswordErrors(errors.passwordErrors)) {
+            return true;
+        } else if (errors.usernameError !== "") {
+            return true;
+        } else if (errors.emailError !== "") {
+            return true;
+        }
+        return false;
+    }
+
+    function areThereFullNameErrors(fullNameErrors: {firstNameError: string, lastNameError: string}): boolean {
+        return fullNameErrors.firstNameError !== "" || fullNameErrors.lastNameError !== "";
+    }
+
+    function areTherePasswordErrors(passwordErrors: {passwordError: string, confirmedPasswordError: string}): boolean {
+        return passwordErrors.passwordError !== "" || passwordErrors.confirmedPasswordError !== "";
     }
 
     function onChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
@@ -126,27 +184,27 @@ const SignUpPage: React.FC<SignUpPageProps> = props => {
     }
 
     function updateFirstName(newName: string) {
-        props.signUpPageViewModel.setFirstName(newName);
+        setFirstName(newName);
     }
 
     function updateLastName(newLastName: string) {
-        props.signUpPageViewModel.setLastName(newLastName);
+        setLastName(newLastName);
     }
 
     function updateEmail(newEmail: string) {
-        props.signUpPageViewModel.setEmailAddress(newEmail);
+        setEmail(newEmail);
     }
 
     function updateUsername(newUsername: string) {
-        props.signUpPageViewModel.setUsername(newUsername);
+        setUsername(newUsername);
     }
 
     function updatePassword(newPassword: string) {
-        props.signUpPageViewModel.setPassword(newPassword);
+        setPassword(newPassword);
     }
 
     function updateConfirmPassword(newPassword: string) {
-        props.signUpPageViewModel.setConfirmedPassword(newPassword);
+        setConfirmedPassword(newPassword);
     }
 
     function renderFirstnameField(): JSX.Element {

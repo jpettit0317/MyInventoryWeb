@@ -8,6 +8,8 @@ import IPasswordInfo from '../interfaces/modelinterfaces/IPasswordInfo';
 import { UserService } from '../services/UserService';
 import PasswordService from '../services/PasswordService';
 import { createPasswordModel } from './PasswordServiceUtils';
+import UserPasswordInfo from '../interfaces/modelinterfaces/UserPasswordInfo';
+import LoginController from '../controllers/LoginController';
 
 export const portNumber: number = 4000;
 
@@ -21,6 +23,13 @@ function createModelsForSignUp(userConnection: Connection, passwordConnection: C
 export function createSignUpController(userInfo: UserSignUpInfo, userConnection: Connection, passwordConnection: Connection): SignUpController {
     const models = createModelsForSignUp(userConnection, passwordConnection);
     return initSignUpController(userInfo, models.userModel, models.passwordModel);
+}
+
+export function createLoginController(providedLogin: UserPasswordInfo, passwordConnection: Connection): LoginController {
+    const passwordModel = createPasswordModel(passwordConnection);
+    const passwordService = PasswordService.createPasswordService(passwordModel);
+
+    return LoginController.createLoginController(providedLogin, passwordService);
 }
 
 function initSignUpController(userInfo: UserSignUpInfo,

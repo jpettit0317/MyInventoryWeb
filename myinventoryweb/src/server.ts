@@ -5,13 +5,13 @@ import { createUserConnection, closeUserConnection } from './models/dbModels/DBU
 import UserSignUpInfo from './interfaces/modelinterfaces/UserSignUpInfo';
 import {
     portNumber,
-    createSignUpController
+    createSignUpController,
+    createLoginController
 } from "./utils/serverHelper";
 import SignUpController from "./controllers/SignUpController";
 import { Connection } from "mongoose";
 import { createPasswordConnection } from "./utils/PasswordServiceUtils";
 import UserPasswordInfo from "./interfaces/modelinterfaces/UserPasswordInfo";
-import bodyParser from "body-parser";
 
 const app = express();
 
@@ -52,16 +52,25 @@ app.post(ApiURL.createUser, async (req, res) => {
 });
 
 app.post(ApiURL.verifyLogin, (req, res) => {
-    console.log("Verifying user.");
-
-    console.log("Body as string " + req.body.username);
     const providedLogin: UserPasswordInfo = {
         username: String(req.body.username),
         password: String(req.body.password)
     };
 
-    logUserLoginInfo(providedLogin);
-    res.send("");
+    const loginController = createLoginController(providedLogin, passwordConnection);
+
+    loginController.verifyUserLogin().then((verifyResult: string) => {
+        if (verifyResult === "") {
+            console.log("Password is correct");
+            res.send("");
+        } else {
+            console.log("Invalid username or password");
+            res.send("Username or password is invalid.");
+        }
+    }).catch(() => {
+        console.log("An error as occured");
+        res.send("Error");
+    });
 });
 
 function logUserInfo(userInfo: UserSignUpInfo) {

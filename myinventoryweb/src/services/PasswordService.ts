@@ -3,6 +3,7 @@ import IPasswordInfo from "../interfaces/modelinterfaces/IPasswordInfo";
 import { Model } from "mongoose";
 import UserPasswordDBInfo from "../interfaces/modelinterfaces/UserPasswordDBInfo";
 import bcrypt from "bcrypt";
+import VerifyUserMessages from "../enums/VerifyUserMessages_enum";
 
 class PasswordService {
     private passwordDB: Model<IPasswordInfo>;
@@ -53,10 +54,10 @@ class PasswordService {
                        password: passwordInfo.password,
                        salt: passwordInfo.salt
                    };
-                   resolve({info: dbPasswordInfo, reason: "User exists"});
+                   resolve({info: dbPasswordInfo, reason: VerifyUserMessages.userDoesExist});
                } else {
                    console.log(`Username: ${usernameToFind} doesn't exist`);
-                   resolve({info: null, reason: "User doesn't exist"});
+                   resolve({info: null, reason: VerifyUserMessages.userDoesntExist});
                }
            }).catch((reasonForRejection: string) => {
                resolve({info: null, reason: reasonForRejection});
@@ -115,13 +116,16 @@ class PasswordService {
                     const storedPassword = result.info.password;
                     await this.doPasswordsMatch(userPassedIn.password, storedPassword).then((passwordMatchResult) => {
                         if (passwordMatchResult) {
-                            resolve({result: true, reason: ""});
+                            console.log(`Passwords do match for ${userPassedIn.username}`)
+                            resolve({result: true, reason: VerifyUserMessages.passwordsMatch});
                         } else {
-                            resolve({result: false, reason: "Passwords don't match"});
+                            console.log(`Password for username ${userPassedIn.username} doesn't exist`);
+                            resolve({result: false, reason: VerifyUserMessages.passwordsDontMatch});
                         }
                     })
                 } else {
-                    resolve({result: false, reason: "User doesn't exist"});
+                    console.log(`Username ${userPassedIn.username} doesn't exist in validateuser`);
+                    resolve({result: false, reason: VerifyUserMessages.userDoesntExist});
                 }
             })
         });

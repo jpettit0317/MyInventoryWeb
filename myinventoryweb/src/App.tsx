@@ -12,13 +12,8 @@ import FullApiURL from "./enums/FullApiURL_enum";
 import LoginNetworkCallManager from './utils/LoginNetworkCallManager';
 
 function App() {
-  const loginNetworkCallManager = LoginNetworkCallManager.createLoginNetworkCallManager(FullApiURL.verifyUser);
-  const loginPageViewModel = LoginPageViewModel.createLoginPageViewModel("", "", loginNetworkCallManager);  
-  const signUpPageViewModel = createSignUpPageViewModel(FullApiURL.createUser);
-
-  function createSignUpPageViewModel(urlString: string = "") : SignUpPageViewModel {
-    const newNetworkCallManager = SignUpNetworkCallManager.createNetworkManager(urlString);
-    return SignUpPageViewModel.createEmptyViewModel(newNetworkCallManager);
+  function createSignUpPage() : JSX.Element {
+    return <SignUpPage firstName="" lastName="" username="" email="" password="" confirmedPassword="" />;
   }
 
   return (
@@ -32,11 +27,11 @@ function App() {
           />
           <Route 
              path={RoutePath.signup} 
-             component={ () => <SignUpPage signUpPageViewModel={signUpPageViewModel} /> } 
+             component={ () => createSignUpPage() } 
           /> 
           <Route 
              path={RoutePath.home} 
-             component={() => <LoginPage loginPageViewModel={loginPageViewModel} />} 
+             component={() => <LoginPage username="" password="" />} 
           />
         </Switch>
       </BrowserRouter>

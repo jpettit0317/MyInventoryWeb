@@ -37,6 +37,7 @@ class LoginPageViewModel extends LoginViewModel {
             userNameError = this.emptyUsernameError;
         } 
         if (this.getPassword() === "") {
+            console.log("Password is empty.");
             passwordError = this.emptyPasswordError
         }
         return {usernameError: userNameError, passwordError: passwordError};
@@ -52,16 +53,11 @@ class LoginPageViewModel extends LoginViewModel {
     }
 
     async validateUserLogin(): Promise<string> {
-        console.log("Validting user");
         const providedLogin = this.getUserLoginInfo();
-        console.log(`Changed login uname: ${providedLogin.username}, p: ${providedLogin.password}`);
         return new Promise(async (resolve, reject) => {
-            console.log("Calling sendVerify");
             await this.loginNetworkCallManager.sendVerifyUserRequest(providedLogin).then(() => {
-                console.log("Resolving");
                 resolve("");
             }).catch((reason: string) => {
-                console.log("Rejecting");
                 reject(reason);
             });
         });

@@ -12,9 +12,13 @@ import Container from '@material-ui/core/Container';
 import loginPageStyles from '../componentstyles/loginpagestyles';
 import { withRouter, RouteComponentProps, Link } from 'react-router-dom';
 import LoginPageViewModel from '../viewmodels/LoginPageViewModel';
+import LoginNetworkCallManager from '../utils/LoginNetworkCallManager';
+import FullApiURL from '../enums/FullApiURL_enum';
+import { ContactSupportOutlined } from '@material-ui/icons';
 
 interface LoginPageProps extends RouteComponentProps {
-    loginPageViewModel: LoginPageViewModel; 
+    username: string,
+    password: string 
 }
 
 const LoginPage: React.FC<LoginPageProps> = props => {
@@ -23,43 +27,72 @@ const LoginPage: React.FC<LoginPageProps> = props => {
     const usernameId: string = "username";
     const passwordId: string = "password";
 
-    let loginPageViewModel = props.loginPageViewModel;
-    
-    const [errors, setErrors] = useState({usernameError: "", passwordError: ""});
+    const [usernameError, setUsernameError] = useState("");
+    const [passwordError, setPasswordError] = useState("");
+    const [username, setUsername] = useState(props.username);
+    const [password, setPassword] = useState(props.password);
+    const [usernameErrorFlag, setUsernameErrorFlag] = useState(false);
+
+    function createLoginPageViewModel(): LoginPageViewModel {
+        const loginNetworkCallManager = LoginNetworkCallManager.createLoginNetworkCallManager(FullApiURL.verifyUser);
+
+        return LoginPageViewModel.createLoginPageViewModel(username, password, loginNetworkCallManager);
+    }
 
     async function onSubmit() {
+        const loginPageViewModel = createLoginPageViewModel();
         let result = loginPageViewModel.reportError();
-        const loginInfo = {username: loginPageViewModel.getUsername(),
-                           password: loginPageViewModel.getPassword()};
-
-        console.log("On submit " + " username: " + loginInfo.username + " password: " + loginInfo.password);
+        
+        if (changeLoginState(result)) {
+            return;
+        }
 
         await loginPageViewModel.validateUserLogin().then(() => {
-            console.log("Nothing went wrong");
+            setLoginErrorState(false, "");
+            console.log("Transitioning to MyInventory page.");
         }).catch( (rejectReason: string) => {
-            console.log("Reason for rejction " + rejectReason);
-            result.passwordError = rejectReason;
-            console.log("Setting password error");
+            setLoginErrorState(true, rejectReason);
         });
+    }
 
-        setErrors(result);
+    function changeLoginState(state: {usernameError: string, passwordError: string}): boolean {
+        if (state.usernameError !== "") {
+            setUsernameErrorFlag(true);
+            setUsernameError(state.usernameError);
+        } else {
+            setUsernameError("");
+            setUsernameErrorFlag(false);
+        }
+
+        if (state.passwordError !== "") {
+            console.log("Password error is " + state.passwordError)
+            setPasswordError(state.passwordError);
+        }
+
+        return state.usernameError !== "" || state.passwordError !== "";
+    }
+
+    function setLoginErrorState(isUsernameInErrorState: boolean, passwordError: string = "") {
+        if (isUsernameInErrorState) {
+            setUsernameErrorFlag(true);
+        } else {
+            setUsernameErrorFlag(false);
+        }
+        setPasswordError(passwordError);
     }
 
     function onChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
-        console.log("Changing");
         if (event.target.id === usernameId) {
             const newUsername = event.target.value;
-            loginPageViewModel.setUsername(newUsername);
-            console.log("The new username is " + loginPageViewModel.getUsername());
+            setUsername(newUsername);
         } else if (event.target.id === passwordId) {
             const newPassword = event.target.value;
-            loginPageViewModel.setPassword(newPassword);
-            console.log("The new password is " + loginPageViewModel.getPassword());
+            setPassword(newPassword);
         }
     }
 
     function renderUsernameTextField(): JSX.Element {
-        if (errors.usernameError === "") {
+        if (!usernameErrorFlag) {
             return renderNormalUsernameTextField();
         } else {
             return renderErrorUsernameTextField();
@@ -96,14 +129,14 @@ const LoginPage: React.FC<LoginPageProps> = props => {
                 onChange={onChange}
                 id={usernameId}
                 error
-                helperText="Username must be filled in."
+                helperText={usernameError}
                 // value={loginPageViewModel.getUsername()}
             />
         );
     }
 
     function renderPasswordTextField(): JSX.Element {
-        if (errors.passwordError === "") {
+        if (passwordError === "") {
             return renderNormalPasswordField();
         } else {
             return renderErrorPasswordField();
@@ -142,7 +175,7 @@ const LoginPage: React.FC<LoginPageProps> = props => {
                 onChange={onChange}
                 id={passwordId}
                 error
-                helperText="Password must be filled in."
+                helperText={passwordError}
                 // value={loginPageViewModel.getPassword()}
             />
         );
