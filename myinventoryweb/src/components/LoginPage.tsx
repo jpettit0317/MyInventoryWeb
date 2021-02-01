@@ -15,6 +15,7 @@ import LoginPageViewModel from '../viewmodels/LoginPageViewModel';
 import LoginNetworkCallManager from '../utils/LoginNetworkCallManager';
 import FullApiURL from '../enums/FullApiURL_enum';
 import { ContactSupportOutlined } from '@material-ui/icons';
+import RoutePath from '../enums/RoutePath_enum';
 
 interface LoginPageProps extends RouteComponentProps {
     username: string,
@@ -210,9 +211,12 @@ const LoginPage: React.FC<LoginPageProps> = props => {
                     </Button>
                     <Grid container>
                         <Grid item>
-                            <Link to="/signup">
+                            <Link to={RoutePath.signup}>
                                 {signUpLink}
                             </Link>
+                            <Link to={RoutePath.myinventory}>
+                                MyInventory
+                            </ Link> 
                         </Grid>
                     </Grid>
                 </form>

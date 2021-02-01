@@ -2,6 +2,8 @@
 
 # dependencies
 myinventoryweb/node_modules
+myinventoryweb/src/DummyItems.ts
+myinventoryweb/src/logo192.png
 #/.pnp
 #.pnp.js
 
