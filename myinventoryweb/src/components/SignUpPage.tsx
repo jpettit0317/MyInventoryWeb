@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { withRouter, RouteComponentProps } from 'react-router-dom';
+import { withRouter, RouteComponentProps, Redirect } from 'react-router-dom';
 import SignUpPageViewModel from '../viewmodels/SignUpPageViewModel';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -22,6 +22,7 @@ import SignUpNetworkCallManager from "../utils/SignUpNetworkCallManager";
 import FullApiURL from "../enums/FullApiURL_enum";
 import NetworkCallManager from "../interfaces/modelinterfaces/NetworkCallManager";
 import { removeDoubleQuotesFromString } from "../utils/StringUtil";
+import RoutePath from "../enums/RoutePath_enum";
 
 function Copyright() {
     return (
@@ -96,8 +97,10 @@ const SignUpPage: React.FC<SignUpPageProps> = props => {
     const [email, setEmail] = useState(props.email);
     const [password, setPassword] = useState(props.password);
     const [confirmedPassword, setConfirmedPassword] = useState(props.confirmedPassword);
+    const [shouldRedirect, setShouldRedirect] = useState(false);
+    const [redirectDestination, setRedirectDestination] = useState(RoutePath.home);
 
-    function onClick() {
+    async function onClick() {
         const viewModelProps: SignUpViewModelProps = {
             username: username,
             passwords: {password: password, confirmedPassword: confirmedPassword},
@@ -106,23 +109,25 @@ const SignUpPage: React.FC<SignUpPageProps> = props => {
         };
         const signUpNetworkCallManager = SignUpNetworkCallManager.createNetworkManager(FullApiURL.createUser);
         
-        sendUserSignUpOverNetwork(viewModelProps, signUpNetworkCallManager);
+        await sendUserSignUpOverNetwork(viewModelProps, signUpNetworkCallManager);
     }
 
-    function sendUserSignUpOverNetwork(viewModelProps: SignUpViewModelProps, networkCallManager: SignUpNetworkCallManager) {
+    async function sendUserSignUpOverNetwork(viewModelProps: SignUpViewModelProps, networkCallManager: SignUpNetworkCallManager) {
         const signUpPageViewModel = SignUpPageViewModel.createViewModel(viewModelProps, networkCallManager);
         const currentErrors = signUpPageViewModel.reportError();
         
         updateErrors(currentErrors);
 
         if (areThereErrors(currentErrors)) {
+            console.log("Errors");
             return;
         }
 
         const userInfo = signUpPageViewModel.getUserInfo();
 
-        signUpPageViewModel.signUpNetworkCallManager.sendCreateUserRequest(userInfo).then((result) => {
+        await signUpPageViewModel.signUpNetworkCallManager.sendCreateUserRequest(userInfo).then((result) => {
             console.log("No error found");
+            setRedirect({destination: RoutePath.myinventory, shouldRedirect: true});
         }).catch((error) => {
             const errorValue = removeDoubleQuotesFromString(String(error));
             if (errorValue === "Error: Network Error") {
@@ -140,6 +145,17 @@ const SignUpPage: React.FC<SignUpPageProps> = props => {
         setEmailError(errors.emailError);
         setPasswordError(errors.passwordErrors.passwordError);
         setConfirmedPasswordError(errors.passwordErrors.confirmedPasswordError);
+    }
+
+    function setRedirect(info: {destination: RoutePath, shouldRedirect: boolean}) {
+        setRedirectDestination(info.destination);
+        setShouldRedirect(info.shouldRedirect);
+    }
+
+    function redirectToPage() {
+        if (shouldRedirect) {
+            return <Redirect to={redirectDestination} />
+        }
     }
 
     function areThereErrors(errors: SignUpViewErrors): boolean {
@@ -457,6 +473,7 @@ const SignUpPage: React.FC<SignUpPageProps> = props => {
         <Container component="main" maxWidth="xs">
             <CssBaseline />
             <div className={classes.paper}>
+                {redirectToPage()}
                 <Avatar className={classes.avatar}>
                     <LockOutlinedIcon />
                 </Avatar>

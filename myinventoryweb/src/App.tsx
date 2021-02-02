@@ -30,14 +30,14 @@ function App() {
             exact path={RoutePath.myinventory}
             component={MyInventory}
           />
+          <Route
+            exact path={RoutePath.signup}
+            component={() => createSignUpPage()}
+          /> 
           <Route 
              exact path={RoutePath.login} 
              component={LoginPage} 
           />
-          <Route 
-             exact path={RoutePath.signup} 
-             component={ () => createSignUpPage() } 
-          /> 
         </Switch>
       </BrowserRouter>
     </div>
