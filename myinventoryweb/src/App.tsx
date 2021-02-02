@@ -22,22 +22,22 @@ function App() {
       <NavBar navBarTitle="MyInventory" />
       <BrowserRouter>
         <Switch>
-          <Route 
-             path={RoutePath.login} 
-             component={LoginPage} 
+          <Route
+            exact path={RoutePath.home}
+            component={() => <LoginPage username="" password="" />}
           />
           <Route
-            path={RoutePath.myinventory}
-            exact component={MyInventory}
+            exact path={RoutePath.myinventory}
+            component={MyInventory}
           />
           <Route 
-             path={RoutePath.signup} 
+             exact path={RoutePath.login} 
+             component={LoginPage} 
+          />
+          <Route 
+             exact path={RoutePath.signup} 
              component={ () => createSignUpPage() } 
           /> 
-          <Route 
-             path={RoutePath.home} 
-             component={() => <LoginPage username="" password="" />} 
-          />
         </Switch>
       </BrowserRouter>
     </div>
