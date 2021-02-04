@@ -1,5 +1,5 @@
 import ItemCount from "../../typeDefs/ItemCount";
-import MyInventoryItemProps from "../../props/MyInventoryItemProps";
+import { MyInventoryItemProps } from "../../props/MyInventoryItemProps";
 
 class MyInventoryItem {
     readonly title: string;
@@ -18,6 +18,16 @@ class MyInventoryItem {
 
     static createItem(props: MyInventoryItemProps): MyInventoryItem {
         return new MyInventoryItem(props);
+    }
+
+    asString(): string {
+        const titleString = `Title: ${this.title}`;
+        const itemIdString = `Id: ${this.itemId}`;
+        const itemOwnerString = `Owner: ${this.owner}`;
+        const itemTypeString = `Type: ${this.type}`;
+        const itemCountString = `Item count: ${this.count.count} ${this.count.units}`;
+
+        return `${titleString} ${itemIdString} ${itemOwnerString} ${itemTypeString} ${itemCountString}`;
     }
 }
 
