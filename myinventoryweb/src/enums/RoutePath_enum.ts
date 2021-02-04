@@ -2,7 +2,8 @@ enum RoutePath {
     login="/login",
     signup="/signup",
     home="/",
-    myinventory="/myinventory"
+    myinventory="/myinventory",
+    addItem="/addItem"
 };
 
 export default RoutePath;

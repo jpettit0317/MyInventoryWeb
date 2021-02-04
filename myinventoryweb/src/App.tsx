@@ -11,6 +11,7 @@ import SignUpNetworkCallManager from "./utils/SignUpNetworkCallManager";
 import FullApiURL from "./enums/FullApiURL_enum";
 import LoginNetworkCallManager from './utils/LoginNetworkCallManager';
 import MyInventory from "./components/MyInventory";
+import AddItemPage from './components/additem/AddItemPage';
 
 function App() {
   function createSignUpPage() : JSX.Element {
@@ -37,6 +38,9 @@ function App() {
           <Route 
              exact path={RoutePath.login} 
              component={LoginPage} 
+          />
+          <Route exact path={RoutePath.addItem}
+                 component={AddItemPage}
           />
         </Switch>
       </BrowserRouter>
