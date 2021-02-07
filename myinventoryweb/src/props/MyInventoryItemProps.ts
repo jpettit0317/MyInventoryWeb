@@ -6,15 +6,19 @@ export interface MyInventoryItemProps {
     owner: string;
     type: string;
     count: ItemCount;
+    description: string;
 };
 
-export function createMyInventoryItemProps(title: string = "", itemId: string = uuidv4(), owner: string = "", type: string = "", count: number = 0, units: string = ""): MyInventoryItemProps {
+export function createMyInventoryItemProps(title: string = "", itemId: string = uuidv4(),
+   owner: string = "", type: string = "", count: ItemCount = {count: 0, units: ""}, 
+   description: string = ""): MyInventoryItemProps {
     const props: MyInventoryItemProps = {
         title: title,
         itemId: itemId,
         owner: owner,
         type: type,
-        count: {count: count, units: units}
+        count: count,
+        description: description
     };
 
     return props;
