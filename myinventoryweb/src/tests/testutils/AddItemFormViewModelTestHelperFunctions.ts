@@ -1,8 +1,8 @@
 import MyInventoryItem from "../../models/usermodels/MyInventoryItem";
 import { MyInventoryItemProps } from "../../props/MyInventoryItemProps";
-import AddItemViewModelErrors from "../../typeDefs/AddItemViewModelErrors";
+import AddItemViewModelErrors from "../../typeDefs/AddItemFormViewModelErrors";
 import ItemCount from "../../typeDefs/ItemCount";
-import AddItemViewModel from "../../viewmodels/AddItemViewModel";
+import AddItemViewModel from "../../viewmodels/AddItemFormViewModel";
 
 export function verifyItems(items: MyInventoryItem[]) {
     const [actualItem, expectedItem] = items;
@@ -21,7 +21,7 @@ function verifyItemCount(itemCounts: ItemCount[]) {
     expect(actualItemCount.units).toBe(expectedItemCount.units);
 }
 
-export function verifyAddItemViewModelErrors(errors: AddItemViewModelErrors[]) {
+export function verifyAddItemFormViewModel(errors: AddItemViewModelErrors[]) {
     const [actualErrors, expectedErrors] = errors;
 
     expect(actualErrors.itemTitleError).toBe(expectedErrors.itemTitleError);

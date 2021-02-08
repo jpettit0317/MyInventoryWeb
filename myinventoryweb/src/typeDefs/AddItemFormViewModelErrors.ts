@@ -1,9 +1,9 @@
 
-type AddItemViewModelErrors = {
+type AddItemFormViewModelErrors = {
     itemTitleError: string,
     itemCountError: string,
     itemUnitError: string,
     itemTypeError: string
 };
 
-export default AddItemViewModelErrors;
+export default AddItemFormViewModelErrors;

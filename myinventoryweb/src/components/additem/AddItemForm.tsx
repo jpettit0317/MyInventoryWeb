@@ -6,8 +6,8 @@ import ItemCount from "../../typeDefs/ItemCount";
 import AddItemFormProps from "../../props/AddItemFormProps";
 import AddItemFormTextFieldIds from "../../enums/AddItemFormTextFieldIds_enum";
 import { MyInventoryItemProps, createMyInventoryItemProps } from "../../props/MyInventoryItemProps";
-import AddItemViewModel from "../../viewmodels/AddItemViewModel";
-import AddItemViewModelErrors from "../../typeDefs/AddItemViewModelErrors";
+import AddItemViewModel from "../../viewmodels/AddItemFormViewModel";
+import AddItemFormViewModelErrors from "../../typeDefs/AddItemFormViewModelErrors";
 import { isStringNotANumber } from "../../utils/StringUtil";
 
 function AddItemForm(props: AddItemFormProps) {
@@ -28,7 +28,7 @@ function AddItemForm(props: AddItemFormProps) {
    
     let [itemTitle, setItemTitle] = useState("");
     let [itemDescription, setItemDescription] = useState("");
-    let [itemCountAsString, setItemCountAsString] = useState("0");
+    const [itemCount, setItemCount] = useState(0);
     let [itemUnits, setItemUnits] = useState("");
     let [itemType, setItemType] = useState("");
     let [itemTitleError, setItemTitleError] = useState("");
@@ -37,7 +37,6 @@ function AddItemForm(props: AddItemFormProps) {
     let [itemTypeError, setItemTypeError] = useState("");
 
     function onAddButtonClicked() {
-        const itemCount = Number(itemCountAsString);
         const itemCountWithUnit: ItemCount = {count: itemCount, units: itemUnits};
         const itemProps = createMyInventoryItemProps(itemTitle, undefined, undefined,
             itemType, itemCountWithUnit, itemDescription);
@@ -45,15 +44,29 @@ function AddItemForm(props: AddItemFormProps) {
         const item = MyInventoryItem.createItem(itemProps);
 
         const addItemViewModel = AddItemViewModel.createAddItemViewModelWithItem(item);
-        const formErrors: AddItemViewModelErrors = addItemViewModel.reportError();
+        const formErrors: AddItemFormViewModelErrors = addItemViewModel.reportError();
 
-        setItemTitleError(formErrors.itemTitleError);
-        setItemCountError(formErrors.itemCountError);
-        setItemUnitError(formErrors.itemUnitError);
-        setItemTypeError(formErrors.itemTypeError);
+        setErrors(formErrors);
 
         console.log("Errors " + JSON.stringify(formErrors));
         console.log(item.asString());
+
+        if (!areThereErrors(formErrors)) {
+            props.addItemCallBack(item);
+        }
+    }
+
+    function setErrors(errors: AddItemFormViewModelErrors) {
+        setItemTitleError(errors.itemTitleError);
+        setItemCountError(errors.itemCountError);
+        setItemUnitError(errors.itemUnitError);
+        setItemTypeError(errors.itemTypeError);
+    }
+
+    function areThereErrors(errors: AddItemFormViewModelErrors): boolean {
+        return errors.itemTitleError !== "" || 
+           errors.itemCountError !== "" || errors.itemUnitError !== "" || 
+           errors.itemTypeError !== "";
     }
 
     function onClearButtonClicked() {
@@ -63,7 +76,7 @@ function AddItemForm(props: AddItemFormProps) {
     function clearFields() {
         setItemTitle("");
         setItemDescription("");
-        setItemCountAsString("");
+        setItemCount(0);
         setItemUnits("");
         setItemType("");
     }
@@ -82,11 +95,12 @@ function AddItemForm(props: AddItemFormProps) {
         } else if (targetId === AddItemFormTextFieldIds.itemDescription) {
             setItemDescription(targetValue);
         } else if (targetId === AddItemFormTextFieldIds.itemCount) {
-            if (targetValue === "" || isStringNotANumber(targetValue)) {
-                setItemCountAsString("0");
-            } else {
-                setItemCountAsString(targetValue);
-            }
+            const valueAsNumber = Number.parseInt(targetValue, 10);
+            if (!Number.isNaN(valueAsNumber)) {
+                console.log("Item count is now " + valueAsNumber);
+                setItemCount(valueAsNumber);
+                console.log("After set count is " + itemCount);
+            } 
         }
     }
 
@@ -164,7 +178,10 @@ function AddItemForm(props: AddItemFormProps) {
                 label={textFieldLabels.itemCount}
                 onChange={onFieldChanged}
                 autoFocus
-                value={itemCountAsString}
+                value={itemCount}
+                type={"number"}
+                InputProps={{ inputProps: {min: 0}}}
+                
             />
         );
     }
@@ -180,9 +197,11 @@ function AddItemForm(props: AddItemFormProps) {
                 label={textFieldLabels.itemCount}
                 onChange={onFieldChanged}
                 autoFocus
-                value={itemCountAsString}
+                value={itemCount}
                 error
                 helperText={itemCountError}
+                type={"number"}
+                InputProps={{ inputProps: { min: 0 } }}
             />
        ); 
     }

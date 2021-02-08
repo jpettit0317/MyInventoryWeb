@@ -1,7 +1,8 @@
 import MyInventoryItem from "../models/usermodels/MyInventoryItem";
-import AddItemViewModelErrors from "../typeDefs/AddItemViewModelErrors";
+import AddItemFormViewModelErrors from "../typeDefs/AddItemFormViewModelErrors";
+import AddItemNetworkCallManager from "../utils/AddItemNetworkCallManager";
 
-class AddItemViewModel {
+class AddItemFormViewModel {
     readonly item: MyInventoryItem;
 
     static readonly errors = {
@@ -15,18 +16,18 @@ class AddItemViewModel {
         this.item = newItem;
     }
 
-    static createAddItemViewModelWithItem(newItem: MyInventoryItem): AddItemViewModel {
-        return new AddItemViewModel(newItem);
+    static createAddItemViewModelWithItem(newItem: MyInventoryItem): AddItemFormViewModel {
+        return new AddItemFormViewModel(newItem);
     }
 
-    reportError(): AddItemViewModelErrors {
+    reportError(): AddItemFormViewModelErrors {
         const errors = this.getErrors();
 
         return errors;
     }
 
-    private getErrors(): AddItemViewModelErrors {
-        let errors: AddItemViewModelErrors = {
+    private getErrors(): AddItemFormViewModelErrors {
+        let errors: AddItemFormViewModelErrors = {
             itemTitleError: "",
             itemCountError: "",
             itemUnitError: "",
@@ -34,24 +35,26 @@ class AddItemViewModel {
         };
 
         if (this.item.title === "") {
-            errors.itemTitleError = AddItemViewModel.errors.emptyTitle;
+            errors.itemTitleError = AddItemFormViewModel.errors.emptyTitle;
         }
 
         if (this.item.count.count < 0) {
-            errors.itemCountError = AddItemViewModel.errors.negativeCount;
+            errors.itemCountError = AddItemFormViewModel.errors.negativeCount;
         }
 
         if (this.item.count.units === "") {
-            errors.itemUnitError = AddItemViewModel.errors.emptyUnit;
+            errors.itemUnitError = AddItemFormViewModel.errors.emptyUnit;
         }
 
         if (this.item.type === "") {
-            errors.itemTypeError = AddItemViewModel.errors.emptyType;
+            errors.itemTypeError = AddItemFormViewModel.errors.emptyType;
         }
 
         return errors;
     }
 
+    
+
 }
 
-export default AddItemViewModel;
+export default AddItemFormViewModel;

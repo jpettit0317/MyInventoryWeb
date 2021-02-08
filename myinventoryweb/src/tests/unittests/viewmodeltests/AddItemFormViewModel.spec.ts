@@ -1,8 +1,8 @@
 import { createMyInventoryItemProps } from "../../../props/MyInventoryItemProps";
-import AddItemViewModelErrors from "../../../typeDefs/AddItemViewModelErrors";
-import AddItemViewModel from "../../../viewmodels/AddItemViewModel";
-import * as TestUtilFuncs from "../../testutils/AddItemViewModelTestHelperFunctions";
-import * as TestUtilVars from "../../testutils/AddItemViewModelTestHelperVars";
+import AddItemViewModelErrors from "../../../typeDefs/AddItemFormViewModelErrors";
+import AddItemViewModel from "../../../viewmodels/AddItemFormViewModel";
+import * as TestUtilFuncs from "../../testutils/AddItemFormViewModelTestHelperFunctions";
+import * as TestUtilVars from "../../testutils/AddItemFormViewModelTestHelperVars";
 
 
 describe('AddItemViewModel tests', () => {
@@ -27,7 +27,7 @@ describe('AddItemViewModel tests', () => {
             const actualErrors = sut.reportError();
             const expectedErrors = TestUtilVars.emptyErrors;
 
-            TestUtilFuncs.verifyAddItemViewModelErrors([actualErrors, expectedErrors]);
+            TestUtilFuncs.verifyAddItemFormViewModel([actualErrors, expectedErrors]);
         });
 
         it('when item has an empty title field, reportError should return a title error', () => {
@@ -41,7 +41,7 @@ describe('AddItemViewModel tests', () => {
                 itemTitleError: AddItemViewModel.errors.emptyTitle
             };
 
-            TestUtilFuncs.verifyAddItemViewModelErrors([actualErrors, expectedErrors]);
+            TestUtilFuncs.verifyAddItemFormViewModel([actualErrors, expectedErrors]);
         });
 
         it('when an item has a negative count, reportError should return an itemCount error', () => {
@@ -55,7 +55,7 @@ describe('AddItemViewModel tests', () => {
                 itemCountError: AddItemViewModel.errors.negativeCount
             };
 
-            TestUtilFuncs.verifyAddItemViewModelErrors([actualErrors, expectedErrors]);
+            TestUtilFuncs.verifyAddItemFormViewModel([actualErrors, expectedErrors]);
         });
 
         it('when an item has an empty unit, reportError should return an itemUnitError', () => {
@@ -69,7 +69,7 @@ describe('AddItemViewModel tests', () => {
                 itemUnitError: AddItemViewModel.errors.emptyUnit 
             };
 
-            TestUtilFuncs.verifyAddItemViewModelErrors([actualErrors, expectedErrors]);
+            TestUtilFuncs.verifyAddItemFormViewModel([actualErrors, expectedErrors]);
         });
 
         it('when an item has an empty type, reportError should return an itemTypeError', () => {
@@ -83,7 +83,7 @@ describe('AddItemViewModel tests', () => {
                 itemTypeError: AddItemViewModel.errors.emptyType
             };
 
-            TestUtilFuncs.verifyAddItemViewModelErrors([actualErrors, expectedErrors]);
+            TestUtilFuncs.verifyAddItemFormViewModel([actualErrors, expectedErrors]);
         });
 
         it('when an item has no fields filled in, reportError should return an error for all required fields', () => {
@@ -91,7 +91,7 @@ describe('AddItemViewModel tests', () => {
 
             const actualErrors = sut.reportError();
 
-            TestUtilFuncs.verifyAddItemViewModelErrors([actualErrors, TestUtilVars.allErrors]);
+            TestUtilFuncs.verifyAddItemFormViewModel([actualErrors, TestUtilVars.allErrors]);
         });
     });
 });

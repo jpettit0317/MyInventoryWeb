@@ -1,7 +1,7 @@
 import MyInventoryItem from "../../models/usermodels/MyInventoryItem";
 import { MyInventoryItemProps, createMyInventoryItemProps } from "../../props/MyInventoryItemProps";
-import AddItemViewModelErrors from "../../typeDefs/AddItemViewModelErrors";
-import AddItemViewModel from "../../viewmodels/AddItemViewModel";
+import AddItemViewModelErrors from "../../typeDefs/AddItemFormViewModelErrors";
+import AddItemFormViewModel from "../../viewmodels/AddItemFormViewModel";
 
 export const emptyItemProps = createMyInventoryItemProps();
 
@@ -33,8 +33,8 @@ export const emptyErrors: AddItemViewModelErrors = {
 };
 
 export const allErrors: AddItemViewModelErrors = {
-    itemTitleError: AddItemViewModel.errors.emptyTitle,
-    itemTypeError: AddItemViewModel.errors.emptyType,
-    itemCountError: AddItemViewModel.errors.negativeCount,
-    itemUnitError: AddItemViewModel.errors.emptyUnit
+    itemTitleError: AddItemFormViewModel.errors.emptyTitle,
+    itemTypeError: AddItemFormViewModel.errors.emptyType,
+    itemCountError: AddItemFormViewModel.errors.negativeCount,
+    itemUnitError: AddItemFormViewModel.errors.emptyUnit
 };

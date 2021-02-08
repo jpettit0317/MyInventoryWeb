@@ -12,6 +12,8 @@ import SignUpController from "./controllers/SignUpController";
 import { Connection } from "mongoose";
 import { createPasswordConnection } from "./utils/PasswordServiceUtils";
 import UserPasswordInfo from "./interfaces/modelinterfaces/UserPasswordInfo";
+import { MyInventoryItemProps } from "./props/MyInventoryItemProps";
+import MyInventoryItem from "./models/usermodels/MyInventoryItem";
 
 const app = express();
 
@@ -73,12 +75,33 @@ app.post(ApiURL.verifyLogin, (req, res) => {
     });
 });
 
+app.post(ApiURL.addItem, (req, res) => {
+    const itemProps: MyInventoryItemProps = {
+        title: req.body.title,
+        itemId: req.body.itemId,
+        owner: req.body.owner,
+        type: req.body.type,
+        count: req.body.count,
+        description: req.body.description
+    };
+
+    const item = MyInventoryItem.createItem(itemProps);
+
+    logAddItem(item);
+
+    res.send("");
+});
+
 function logUserInfo(userInfo: UserSignUpInfo) {
     console.log(`Uname: ${userInfo.username}`);
     console.log(`Pswd: ${userInfo.password}`);
     console.log(`Email: ${userInfo.email}`);
     console.log(`Firstname: ${userInfo.firstName}`);
     console.log(`Lastname: ${userInfo.lastName}`);
+}
+
+function logAddItem(item: MyInventoryItem) {
+    console.log(`Item is ${item.asString()}`);
 }
 
 function logUserLoginInfo(userInfo: UserPasswordInfo) {
