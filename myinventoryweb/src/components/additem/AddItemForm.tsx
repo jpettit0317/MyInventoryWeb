@@ -38,7 +38,7 @@ function AddItemForm(props: AddItemFormProps) {
 
     function onAddButtonClicked() {
         const itemCountWithUnit: ItemCount = {count: itemCount, units: itemUnits};
-        const itemProps = createMyInventoryItemProps(itemTitle, undefined, undefined,
+        const itemProps = createMyInventoryItemProps(itemTitle, undefined, "jpettit0317",
             itemType, itemCountWithUnit, itemDescription);
         
         const item = MyInventoryItem.createItem(itemProps);

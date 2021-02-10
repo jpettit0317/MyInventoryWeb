@@ -6,7 +6,8 @@ import UserSignUpInfo from './interfaces/modelinterfaces/UserSignUpInfo';
 import {
     portNumber,
     createSignUpController,
-    createLoginController
+    createLoginController,
+    createAddItemController
 } from "./utils/serverHelper";
 import SignUpController from "./controllers/SignUpController";
 import { Connection } from "mongoose";
@@ -14,11 +15,14 @@ import { createPasswordConnection } from "./utils/PasswordServiceUtils";
 import UserPasswordInfo from "./interfaces/modelinterfaces/UserPasswordInfo";
 import { MyInventoryItemProps } from "./props/MyInventoryItemProps";
 import MyInventoryItem from "./models/usermodels/MyInventoryItem";
+import AddItemController from "./controllers/AddItemController";
+import { createItemConnection } from "./utils/AddItemUtils";
 
 const app = express();
 
 let userConnection: Connection;
 let passwordConnection: Connection;
+let itemConnection: Connection;
 
 app.use(express.json());
 app.use(express.urlencoded({
@@ -29,6 +33,7 @@ app.listen(portNumber, () => {
     console.log("Listening on port " + portNumber);
     userConnection = createUserConnection();
     passwordConnection = createPasswordConnection();
+    itemConnection = createItemConnection();
 });
 
 app.post(ApiURL.createUser, async (req, res) => {
@@ -75,7 +80,7 @@ app.post(ApiURL.verifyLogin, (req, res) => {
     });
 });
 
-app.post(ApiURL.addItem, (req, res) => {
+app.post(ApiURL.addItem, async (req, res) => {
     const itemProps: MyInventoryItemProps = {
         title: req.body.title,
         itemId: req.body.itemId,
@@ -85,11 +90,15 @@ app.post(ApiURL.addItem, (req, res) => {
         description: req.body.description
     };
 
-    const item = MyInventoryItem.createItem(itemProps);
+    const addItemController = createAddItemController(itemProps, itemConnection);
 
-    logAddItem(item);
-
-    res.send("");
+    await addItemController.addItem().then((addResult: string) => {
+        console.log("Resolving " + addResult);
+        res.send(addResult);
+    }).catch((rejectReason: string) => {
+        console.log("Rejecting " + rejectReason);
+        res.send(rejectReason);
+    });
 });
 
 function logUserInfo(userInfo: UserSignUpInfo) {
@@ -108,3 +117,4 @@ function logUserLoginInfo(userInfo: UserPasswordInfo) {
     console.log(`Username: ${userInfo.username} Password: ${userInfo.password}`);
 }
 
+export {};

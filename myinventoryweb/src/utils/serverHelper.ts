@@ -10,6 +10,11 @@ import PasswordService from '../services/PasswordService';
 import { createPasswordModel } from './PasswordServiceUtils';
 import UserPasswordInfo from '../interfaces/modelinterfaces/UserPasswordInfo';
 import LoginController from '../controllers/LoginController';
+import AddItemController from '../controllers/AddItemController';
+import { createItemModel } from '../utils/AddItemUtils';
+import { MyInventoryItemProps } from '../props/MyInventoryItemProps';
+import MyInventoryItem from '../models/usermodels/MyInventoryItem';
+import ItemService from '../services/ItemService';
 
 export const portNumber: number = 4000;
 
@@ -39,6 +44,14 @@ function initSignUpController(userInfo: UserSignUpInfo,
     const newPasswordService = PasswordService.createPasswordService(passwordDB, 10);
 
     return SignUpController.createSignUpController(props, newUserService, newPasswordService);
+}
+
+export function createAddItemController(newItemProps: MyInventoryItemProps, connection: Connection): AddItemController {
+    const itemModel = createItemModel(connection);
+    const newItem = MyInventoryItem.createItem(newItemProps);
+    const itemService = new ItemService(itemModel);
+
+    return new AddItemController(newItem, itemService);
 }
 
 function createSignUpControllerProps(info: UserSignUpInfo): SignUpControllerProps {
