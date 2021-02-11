@@ -101,12 +101,6 @@ app.post(ApiURL.addItem, async (req, res) => {
     });
 });
 
-app.get(ApiURL.getItems, (req, res) => {
-    const user = req.params.owner;
-
-    res.send(`The owner that sent getItem request is ${user}`);
-});
-
 function logUserInfo(userInfo: UserSignUpInfo) {
     console.log(`Uname: ${userInfo.username}`);
     console.log(`Pswd: ${userInfo.password}`);
