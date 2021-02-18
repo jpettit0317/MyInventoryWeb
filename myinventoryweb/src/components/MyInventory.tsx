@@ -57,6 +57,13 @@ function MyInventory(): JSX.Element {
         };
     }, []);
 
+    function onEditButtonPressed(index: number) {
+        console.log("Editing item at index " + index);
+        const itemToEdit = items[index];
+
+        logItem(itemToEdit);
+    }
+
     function onAddItemButtonPressed() {
         console.log("Add item button was pressed!");
         setRedirect({shouldPush: true, shouldRedirect: true, destination: RoutePath.addItem});
@@ -90,7 +97,7 @@ function MyInventory(): JSX.Element {
                     </Grid>
                     {items.map((item, index) => (
                         <Grid item key={item.itemId} xs={12} md={4}>
-                            {displayCard(item)}
+                            {displayCard({item, index})}
                         </Grid>
                     ))}
                 </ Grid>
@@ -98,14 +105,17 @@ function MyInventory(): JSX.Element {
         );
     }
 
-    function displayCard(item: MyInventoryItem): JSX.Element {
+    function displayCard(cardInfo: {item: MyInventoryItem, index: number}): JSX.Element {
+        const itemToDisplay = cardInfo.item;
+        const index = cardInfo.index;
+
         return (
-            <div>
-                {console.log("Trying to render card")}
-                {console.log("Trying to log item")}
-                {logItem(item)}
-                <MyInventoryItemCard item={item} key={item.itemId}/>
-            </div>
+            <MyInventoryItemCard
+                item={itemToDisplay}
+                index={index}
+                editItemCallBack={onEditButtonPressed}
+                key={itemToDisplay.itemId}
+            />
         );
     }
 
