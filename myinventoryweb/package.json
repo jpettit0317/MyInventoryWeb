@@ -59,10 +59,10 @@
     "web-vitals": "^0.2.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "BROWSER='google chrome' react-scripts start",
+    "build": "BROWSER='google chrome' react-scripts build",
     "test": "jest",
-    "eject": "react-scripts eject",
+    "eject": "BROWSER='google chrome' react-scripts eject",
     "uitests": "jest --env=jsdom ./src/tests/uitests/*.tsx",
     "unittests": "jest ./src/tests/unittests/*/*.ts",
     "inttests": "jest ./src/tests/integrationtests/*.ts",
