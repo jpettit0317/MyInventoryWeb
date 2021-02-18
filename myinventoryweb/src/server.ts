@@ -7,7 +7,8 @@ import {
     portNumber,
     createSignUpController,
     createLoginController,
-    createAddItemController
+    createAddItemController,
+    createGetItemController
 } from "./utils/serverHelper";
 import SignUpController from "./controllers/SignUpController";
 import { Connection } from "mongoose";
@@ -101,10 +102,14 @@ app.post(ApiURL.addItem, async (req, res) => {
     });
 });
 
-app.get(ApiURL.getItems, (req, res) => {
+app.get(ApiURL.getItems, async (req, res) => {
     const owner = req.params.owner;
 
-    res.send(`The owner is ${owner}`);
+    const getItemsController = createGetItemController(itemConnection);
+
+    await getItemsController.getItems(owner).then((itemsAsString) => {
+        res.send(itemsAsString);
+    });
 });
 
 function logUserInfo(userInfo: UserSignUpInfo) {

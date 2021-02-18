@@ -1,34 +1,18 @@
-import { Card, CardContent, Typography, Button, CardActions, makeStyles } from "@material-ui/core";
-import React from "react";
+import { Card, CardContent, Typography, Button, CardActions } from "@material-ui/core";
+import React, { useEffect, useRef } from "react";
 import MyInventoryItem from "../models/usermodels/MyInventoryItem";
-
+import useMyInventoryCardStyles from "../componentstyles/myinventoryitemcardstyles";
 interface MyInventoryItemCardProps {
     item: MyInventoryItem;
 };
 
 function MyInventoryItemCard(props: MyInventoryItemCardProps): JSX.Element {
-    const useStyles = makeStyles({
-        root: {
-            minWidth: 275,
-        },
-        bullet: {
-            display: 'inline-block',
-            margin: '0 2px',
-            transform: 'scale(0.8)',
-        },
-        title: {
-            fontSize: 14,
-        },
-        pos: {
-            marginBottom: 12,
-        },
-    });
-    
-    const classes = useStyles();
-
+    const classes = useMyInventoryCardStyles();
+    console.log("In MyInventory Card.");
     return (
-        <Card className={classes.root}>
-            <CardContent className={classes.title}>
+        <Card className={classes.card}>
+            {console.log("Rendering card " + props.item.title)}
+            <CardContent className={classes.cardContent}>
                 <Typography gutterBottom variant="h5" component="h2">
                     {props.item.title} 
                 </Typography>
@@ -42,10 +26,10 @@ function MyInventoryItemCard(props: MyInventoryItemCardProps): JSX.Element {
             <CardActions>
                 <Button size="small" color="primary">
                     View
-                    </Button>
+                </Button>
                 <Button size="small" color="primary">
                     Edit
-                    </Button>
+                </Button>
             </CardActions>
         </Card>
     );

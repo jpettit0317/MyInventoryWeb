@@ -15,6 +15,7 @@ import { createItemModel } from '../utils/AddItemUtils';
 import { MyInventoryItemProps } from '../props/MyInventoryItemProps';
 import MyInventoryItem from '../models/usermodels/MyInventoryItem';
 import ItemService from '../services/ItemService';
+import MyInventoryController from '../controllers/MyInventoryController';
 
 export const portNumber: number = 4000;
 
@@ -54,6 +55,12 @@ export function createAddItemController(newItemProps: MyInventoryItemProps, conn
     return new AddItemController(newItem, itemService);
 }
 
+export function createGetItemController(connection: Connection): MyInventoryController {
+    const itemModel = createItemModel(connection);
+    const itemService = new ItemService(itemModel);
+    
+    return new MyInventoryController(itemService);
+}
 function createSignUpControllerProps(info: UserSignUpInfo): SignUpControllerProps {
     const props: SignUpControllerProps = {
         username: info.username,
