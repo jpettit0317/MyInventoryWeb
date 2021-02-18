@@ -21,6 +21,7 @@ import MyInventoryNetworkCallManager from "../utils/MyInventoryNetworkCallManage
 import MyInventoryItem from "../models/usermodels/MyInventoryItem";
 import IItem from "../interfaces/modelinterfaces/IItem";
 import { MyInventoryItemProps } from "../props/MyInventoryItemProps";
+import ApiURL from "../enums/ApiURL_enum";
 
 function MyInventory(): JSX.Element {
     const classes = useMyInventoryStyles();
@@ -62,6 +63,11 @@ function MyInventory(): JSX.Element {
         const itemToEdit = items[index];
 
         logItem(itemToEdit);
+        redirectToEditItem();
+    }
+
+    function redirectToEditItem() {
+        setRedirect({ shouldPush: true, shouldRedirect: true, destination: RoutePath.editItem});
     }
 
     function onAddItemButtonPressed() {
@@ -80,9 +86,9 @@ function MyInventory(): JSX.Element {
     }
 
     function setRedirect(info: {shouldPush: boolean, shouldRedirect: boolean, destination: string}) {
-        setShouldRedirect(info.shouldRedirect);
         setShouldPush(info.shouldPush);
         setRedirectDestination(info.destination);
+        setShouldRedirect(info.shouldRedirect);
     }
 
     function renderItems(): JSX.Element {
