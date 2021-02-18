@@ -7,10 +7,15 @@ import MyInventoryItemCardProps from "../props/MyInventoryItemCardProps";
 
 function MyInventoryItemCard(props: MyInventoryItemCardProps): JSX.Element {
     const classes = useMyInventoryCardStyles();
-    console.log("In MyInventory Card.");
+    
+    function onEditPressed() {
+        const itemCardIndex = props.index;
+
+        props.editItemCallBack(itemCardIndex);
+    }
+    
     return (
         <Card className={classes.card}>
-            {console.log("Rendering card " + props.item.title)}
             <CardContent className={classes.cardContent}>
                 <Typography gutterBottom variant="h5" component="h2">
                     {props.item.title} 
@@ -26,7 +31,7 @@ function MyInventoryItemCard(props: MyInventoryItemCardProps): JSX.Element {
                 <Button size="small" color="primary">
                     View
                 </Button>
-                <Button size="small" color="primary">
+                <Button size="small" color="primary" onClick={onEditPressed}>
                     Edit
                 </Button>
             </CardActions>
