@@ -2,9 +2,8 @@ import { Card, CardContent, Typography, Button, CardActions } from "@material-ui
 import React, { useEffect, useRef } from "react";
 import MyInventoryItem from "../models/usermodels/MyInventoryItem";
 import useMyInventoryCardStyles from "../componentstyles/myinventoryitemcardstyles";
-interface MyInventoryItemCardProps {
-    item: MyInventoryItem;
-};
+import MyInventoryItemCardProps from "../props/MyInventoryItemCardProps";
+
 
 function MyInventoryItemCard(props: MyInventoryItemCardProps): JSX.Element {
     const classes = useMyInventoryCardStyles();
