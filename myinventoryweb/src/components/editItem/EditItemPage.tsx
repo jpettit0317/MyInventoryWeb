@@ -1,9 +1,9 @@
 import { Box, Button, Container, CssBaseline, Grid, Link, Typography } from "@material-ui/core";
-import React from "react";
+import React, { useEffect } from "react";
 import MyInventoryItem from "../../models/usermodels/MyInventoryItem";
 import EditItemPageProps from "../../props/EditItemPageProps";
 import EditItemForm from "./EditItemForm";
-import { withRouter } from 'react-router-dom';
+import { useParams, withRouter } from 'react-router-dom';
 import FullApiURL from "../../enums/FullApiURL_enum";
 import useEditItemFormStyles from "../../componentstyles/ediitemformstyles";
 
@@ -12,13 +12,24 @@ function EditItemPage(props: EditItemPageProps) {
 
     const classes = useEditItemFormStyles();
 
+    useEffect(() => {
+        console.log("Loading edit item page.");
+    }, []);
+
     function onClick(item: MyInventoryItem) {
         console.log("Edit item was pressed.");
     }
 
-    function renderAddItemForm(): JSX.Element {
+    function editItem(item: MyInventoryItem) {
+        console.log("In EditItemPage editItem");
+        props.updateItem(item);
+    }
+
+    const renderAddItemForm = (): JSX.Element => {
+        console.log("Rendering item form.");
+        
         return (
-            <EditItemForm itemToEdit={props.itemToEdit}/>
+            <EditItemForm itemToEdit={props.itemToEdit} editItem={editItem} />
         );
     }
 
@@ -27,9 +38,6 @@ function EditItemPage(props: EditItemPageProps) {
             <CssBaseline />
             <div className={classes.paper}>
                 {/* {redirectToPage()} */}
-                <Typography component="h1" variant="h5">
-                    {editItemLabel}
-                </Typography>
                 {renderAddItemForm()}
             </div>
         </Container>

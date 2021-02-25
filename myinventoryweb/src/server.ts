@@ -8,14 +8,15 @@ import {
     createSignUpController,
     createLoginController,
     createAddItemController,
-    createGetItemController
+    createGetItemController,
+    createEditItemController
 } from "./utils/serverHelper";
 import SignUpController from "./controllers/SignUpController";
 import { Connection } from "mongoose";
 import { createPasswordConnection } from "./utils/PasswordServiceUtils";
 import UserPasswordInfo from "./interfaces/modelinterfaces/UserPasswordInfo";
 import { MyInventoryItemProps } from "./props/MyInventoryItemProps";
-import MyInventoryItem from "./models/usermodels/MyInventoryItem";
+import MyInventoryItem, { logItem } from "./models/usermodels/MyInventoryItem";
 import AddItemController from "./controllers/AddItemController";
 import { createItemConnection } from "./utils/AddItemUtils";
 
@@ -109,6 +110,37 @@ app.get(ApiURL.getItems, async (req, res) => {
 
     await getItemsController.getItems(owner).then((itemsAsString) => {
         res.send(itemsAsString);
+    });
+});
+
+app.put(ApiURL.editItem, async (req, res) => {
+    const itemProps: MyInventoryItemProps = {
+        title: req.body.title,
+        itemId: req.body.itemId,
+        owner: req.body.owner,
+        type: req.body.type,
+        count: req.body.count,
+        description: req.body.description
+    };
+
+    const updatedItem = MyInventoryItem.createItem(itemProps);
+
+    console.log("Updated item on backend is ");
+    logItem(updatedItem);
+
+    const editItemController = createEditItemController(itemConnection);
+
+    editItemController.editItem(updatedItem).then((value) => {
+        if (value === "") {
+            console.log("Nothing went wrong");
+            res.send("");
+        } else {
+            console.log("Error is " + value);
+            res.send("Error: " + value);
+        }
+    }).catch((rejectReason: string) => {
+        console.log("Rejecting " + rejectReason);
+        res.send(rejectReason);
     });
 });
 

@@ -20,5 +20,5 @@ export function createItemModel(connection: Connection): Model<IItem> {
 }
 
 export function createItemConnection(): Connection {
-    return createConnection(`mongodb://localhost:27017/${ItemCollectionInfo.collectionName}`);
+    return createConnection(`mongodb://localhost:27017/${ItemCollectionInfo.collectionName}`, {useFindAndModify: false});
 }

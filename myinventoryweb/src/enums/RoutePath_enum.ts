@@ -4,7 +4,7 @@ enum RoutePath {
     home="/",
     myinventory="/myinventory",
     addItem="/addItem",
-    editItem="/editItem"
+    editItem="/editItem/:itemId"
 };
 
 export default RoutePath;

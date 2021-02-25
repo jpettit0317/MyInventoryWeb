@@ -15,13 +15,16 @@ import logo192 from "../logo192.png";
 import MyInventoryItemCard from "./MyInventoryItemCard";
 import createItems from "../DummyItems";
 import useMyInventoryStyles from "../componentstyles/myinventorystyles";
-import { Redirect } from "react-router-dom";
+import { Redirect, Route, Switch, useHistory, useLocation, useRouteMatch } from "react-router-dom";
 import RoutePath from "../enums/RoutePath_enum";
 import MyInventoryNetworkCallManager from "../utils/MyInventoryNetworkCallManager";
-import MyInventoryItem from "../models/usermodels/MyInventoryItem";
+import MyInventoryItem, { logItem, isItemInvalid, isCountValid } from "../models/usermodels/MyInventoryItem";
 import IItem from "../interfaces/modelinterfaces/IItem";
 import { MyInventoryItemProps } from "../props/MyInventoryItemProps";
 import ApiURL from "../enums/ApiURL_enum";
+import EditPageDialog from "./editItem/EditPageDialog";
+import editItem from "../utils/EditItemNetworkRequestUtil";
+import FullApiURL from "../enums/FullApiURL_enum";
 
 function MyInventory(): JSX.Element {
     const classes = useMyInventoryStyles();
@@ -31,6 +34,8 @@ function MyInventory(): JSX.Element {
     const [redirectDestination, setRedirectDestination] = useState("");
     const [items, setItems] = useState<MyInventoryItem[]>([]);
     const [didItemsLoad, setDidItemsLoad] = useState(false);
+    const [selectedItem, setSelectedItem] = useState<MyInventoryItem>(MyInventoryItem.createEmptyItem());
+    const [shouldOpenDialog, setShouldOpenDialog] = useState(false);
 
     useEffect(() => {
         let mounted = true;
@@ -63,7 +68,29 @@ function MyInventory(): JSX.Element {
         const itemToEdit = items[index];
 
         logItem(itemToEdit);
-        redirectToEditItem();
+        setSelectedItem(itemToEdit);
+        setShouldOpenDialog(true);
+    }
+
+    async function updateItem(updatedItem: MyInventoryItem) {
+        console.log("The new item is\n");
+        logItem(updatedItem);
+
+        await editItem(FullApiURL.editItem, updatedItem).then((result) => {
+            console.log("Updated item");
+            closeDialog();
+            reloadPage();
+        }).catch((reasonForRejection: string) => {
+            console.log("Can't close dialog because " + reasonForRejection);
+        });
+    }
+
+    function closeDialog() {
+        setShouldOpenDialog(false);
+    }
+
+    function reloadPage() {
+        window.location.reload();
     }
 
     function redirectToEditItem() {
@@ -76,13 +103,39 @@ function MyInventory(): JSX.Element {
     }
 
     function redirectToPage(): JSX.Element {
-        if (shouldPush) {
+        if (redirectDestination === RoutePath.editItem) {
+            console.log("Item to edit");
+            logItem(selectedItem);
+            
+            return (
+                <Redirect to={getEditItemUrl()} />
+            );
+        } else if (shouldPush) {
             console.log("Pushing to " + redirectDestination);
             return <Redirect push to={redirectDestination} />;
         } else {
             console.log("Replacing with " + redirectDestination);
             return <Redirect to={redirectDestination} />;
         }
+    }
+   
+    function shouldRenderEditDialog(): boolean {
+        return !isItemInvalid(selectedItem) && shouldOpenDialog;
+    }
+
+    function renderEditDialog(): JSX.Element {
+        return (
+            <EditPageDialog 
+               itemToEdit={selectedItem} 
+               updateItem={updateItem} 
+               closeDialog={closeDialog} 
+               isOpen={shouldOpenDialog} 
+            />
+        );
+    }
+
+    function getEditItemUrl(): string {
+        return `/editItem/${selectedItem.itemId}`;
     }
 
     function setRedirect(info: {shouldPush: boolean, shouldRedirect: boolean, destination: string}) {
@@ -95,6 +148,7 @@ function MyInventory(): JSX.Element {
         return (
             <Container className={classes.cardGrid} maxWidth="md">
                 {shouldRedirect === true ? redirectToPage() : ""}
+                {shouldRenderEditDialog() && renderEditDialog()}
                 <Grid container spacing={4}>
                     <Grid item xs={12}>
                         <Button size="small" color="primary" onClick={onAddItemButtonPressed}>
@@ -131,14 +185,6 @@ function MyInventory(): JSX.Element {
                 Loading...
             </div>
         );
-    }
-
-    function logItem(item: MyInventoryItem) {
-        console.log(`Title: ${item.title}`);
-        console.log(`Owner: ${item.owner}`);
-        console.log(`Type: ${item.type}`);
-        console.log(`Count: ${item.count.count} ${item.count.units}`);
-        console.log(`Description: ${item.description}`);
     }
 
     if (didItemsLoad) {

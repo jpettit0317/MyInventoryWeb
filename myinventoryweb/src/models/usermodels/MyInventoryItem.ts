@@ -1,7 +1,7 @@
 import ItemCount from "../../typeDefs/ItemCount";
-import { MyInventoryItemProps } from "../../props/MyInventoryItemProps";
+import { createMyInventoryItemProps, MyInventoryItemProps } from "../../props/MyInventoryItemProps";
 
-class MyInventoryItem {
+export default class MyInventoryItem {
     readonly title: string;
     readonly itemId: string;
     readonly owner: string;
@@ -22,7 +22,13 @@ class MyInventoryItem {
         return new MyInventoryItem(props);
     }
 
-    asString(): string {
+    static createEmptyItem(): MyInventoryItem {
+        const props = createMyInventoryItemProps();
+
+        return new MyInventoryItem(props);
+    }
+
+    public asString(): string {
         const titleString = `Title: ${this.title}`;
         const itemIdString = `Id: ${this.itemId}`;
         const itemOwnerString = `Owner: ${this.owner}`;
@@ -31,19 +37,30 @@ class MyInventoryItem {
 
         return `${titleString} ${itemIdString} ${itemOwnerString} ${itemTypeString} ${itemCountString}`;
     }
-
-    isItemInvalid(): boolean {
-        if (this.title === "") { return true; }
-        if (this.owner === "") { return true; }
-        if (this.type === "") { return true; }
-        if (!this.isCountValid()) { return true; }
-
-        return false;
-    }
-
-    private isCountValid(): boolean {
-        return this.count.count >= 0 && this.count.units !== "";
-    }
 }
 
-export default MyInventoryItem;
+export function logItem(item: MyInventoryItem | undefined) {
+    if (item !== undefined) {
+        console.log(`Title: ${item.title}`);
+        console.log(`Owner: ${item.owner}`);
+        console.log(`Type: ${item.type}`);
+        console.log(`Count: ${item.count.count} ${item.count.units}`);
+        console.log(`Description: ${item.description}`);
+        console.log(`Item id: ${item.itemId}`);
+    } else {
+        console.log("Item is undefined");
+    }
+};
+
+export function isCountValid(itemCount: ItemCount): boolean {
+    return itemCount.count >= 0 && itemCount.units !== "";
+}
+
+export function isItemInvalid(item: MyInventoryItem): boolean {
+    if (item.title === "") { return true; }
+    if (item.owner === "") { return true; }
+    if (item.type === "") { return true; }
+    if (!isCountValid(item.count)) { return true; }
+
+    return false;
+}

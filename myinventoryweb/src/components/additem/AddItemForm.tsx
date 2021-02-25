@@ -4,10 +4,10 @@ import React, { useState } from "react";
 import MyInventoryItem from "../../models/usermodels/MyInventoryItem";
 import ItemCount from "../../typeDefs/ItemCount";
 import AddItemFormProps from "../../props/AddItemFormProps";
-import AddItemFormTextFieldIds from "../../enums/AddItemFormTextFieldIds_enum";
+import ItemFormTextFieldIds from "../../enums/ItemFormTextFieldIds_enum";
 import { MyInventoryItemProps, createMyInventoryItemProps } from "../../props/MyInventoryItemProps";
-import AddItemViewModel from "../../viewmodels/AddItemFormViewModel";
-import AddItemFormViewModelErrors from "../../typeDefs/AddItemFormViewModelErrors";
+import ItemFormViewModel from "../../viewmodels/ItemFormViewModel";
+import ItemFormViewModelErrors from "../../typeDefs/ItemFormViewModelErrors";
 import { isStringNotANumber } from "../../utils/StringUtil";
 
 function AddItemForm(props: AddItemFormProps) {
@@ -43,8 +43,8 @@ function AddItemForm(props: AddItemFormProps) {
         
         const item = MyInventoryItem.createItem(itemProps);
 
-        const addItemViewModel = AddItemViewModel.createAddItemViewModelWithItem(item);
-        const formErrors: AddItemFormViewModelErrors = addItemViewModel.reportError();
+        const itemViewModel = ItemFormViewModel.createItemViewModelWithItem(item);
+        const formErrors: ItemFormViewModelErrors = itemViewModel.reportError();
 
         setErrors(formErrors);
 
@@ -56,14 +56,14 @@ function AddItemForm(props: AddItemFormProps) {
         }
     }
 
-    function setErrors(errors: AddItemFormViewModelErrors) {
+    function setErrors(errors: ItemFormViewModelErrors) {
         setItemTitleError(errors.itemTitleError);
         setItemCountError(errors.itemCountError);
         setItemUnitError(errors.itemUnitError);
         setItemTypeError(errors.itemTypeError);
     }
 
-    function areThereErrors(errors: AddItemFormViewModelErrors): boolean {
+    function areThereErrors(errors: ItemFormViewModelErrors): boolean {
         return errors.itemTitleError !== "" || 
            errors.itemCountError !== "" || errors.itemUnitError !== "" || 
            errors.itemTypeError !== "";
@@ -86,15 +86,15 @@ function AddItemForm(props: AddItemFormProps) {
 
         console.log(`Field Id: ${targetId}, value: ${targetValue}`);
 
-        if (targetId === AddItemFormTextFieldIds.itemCountUnit) {
+        if (targetId === ItemFormTextFieldIds.itemCountUnit) {
             setItemUnits(targetValue);
-        } else if (targetId === AddItemFormTextFieldIds.itemType) {
+        } else if (targetId === ItemFormTextFieldIds.itemType) {
             setItemType(targetValue);
-        } else if (targetId === AddItemFormTextFieldIds.itemTitle) {
+        } else if (targetId === ItemFormTextFieldIds.itemTitle) {
             setItemTitle(targetValue);
-        } else if (targetId === AddItemFormTextFieldIds.itemDescription) {
+        } else if (targetId === ItemFormTextFieldIds.itemDescription) {
             setItemDescription(targetValue);
-        } else if (targetId === AddItemFormTextFieldIds.itemCount) {
+        } else if (targetId === ItemFormTextFieldIds.itemCount) {
             const valueAsNumber = Number.parseInt(targetValue, 10);
             if (!Number.isNaN(valueAsNumber)) {
                 console.log("Item count is now " + valueAsNumber);
@@ -111,11 +111,11 @@ function AddItemForm(props: AddItemFormProps) {
     function renderItemTitleFieldInError(): JSX.Element {
         return (
             <TextField
-                name={AddItemFormTextFieldIds.itemTitle}
+                name={ItemFormTextFieldIds.itemTitle}
                 variant="outlined"
                 required
                 fullWidth
-                id={AddItemFormTextFieldIds.itemTitle}
+                id={ItemFormTextFieldIds.itemTitle}
                 label={textFieldLabels.itemTitle}
                 onChange={onFieldChanged}
                 autoFocus
@@ -129,11 +129,11 @@ function AddItemForm(props: AddItemFormProps) {
     function renderNormalTitleField(): JSX.Element {
         return (
             <TextField
-                name={AddItemFormTextFieldIds.itemTitle}
+                name={ItemFormTextFieldIds.itemTitle}
                 variant="outlined"
                 required
                 fullWidth
-                id={AddItemFormTextFieldIds.itemTitle}
+                id={ItemFormTextFieldIds.itemTitle}
                 label={textFieldLabels.itemTitle}
                 onChange={onFieldChanged}
                 autoFocus
@@ -145,12 +145,12 @@ function AddItemForm(props: AddItemFormProps) {
     function renderItemDescriptionField(): JSX.Element {
         return (
             <TextField
-                name={AddItemFormTextFieldIds.itemDescription}
+                name={ItemFormTextFieldIds.itemDescription}
                 variant="outlined"
                 fullWidth
                 multiline
                 rows={itemDescriptionRowTotal}
-                id={AddItemFormTextFieldIds.itemDescription}
+                id={ItemFormTextFieldIds.itemDescription}
                 label={textFieldLabels.itemDescription}
                 onChange={onFieldChanged}
                 autoFocus
@@ -170,11 +170,11 @@ function AddItemForm(props: AddItemFormProps) {
     function renderNormalItemCountField(): JSX.Element {
         return (
             <TextField
-                name={AddItemFormTextFieldIds.itemCount}
+                name={ItemFormTextFieldIds.itemCount}
                 variant="outlined"
                 required
                 fullWidth
-                id={AddItemFormTextFieldIds.itemCount}
+                id={ItemFormTextFieldIds.itemCount}
                 label={textFieldLabels.itemCount}
                 onChange={onFieldChanged}
                 autoFocus
@@ -189,11 +189,11 @@ function AddItemForm(props: AddItemFormProps) {
     function renderItemCountFieldError(): JSX.Element {
         return (
             <TextField
-                name={AddItemFormTextFieldIds.itemCount}
+                name={ItemFormTextFieldIds.itemCount}
                 variant="outlined"
                 required
                 fullWidth
-                id={AddItemFormTextFieldIds.itemCount}
+                id={ItemFormTextFieldIds.itemCount}
                 label={textFieldLabels.itemCount}
                 onChange={onFieldChanged}
                 autoFocus
@@ -217,11 +217,11 @@ function AddItemForm(props: AddItemFormProps) {
     function renderNormalItemUnitField(): JSX.Element {
         return (
             <TextField
-                name={AddItemFormTextFieldIds.itemCountUnit}
+                name={ItemFormTextFieldIds.itemCountUnit}
                 variant="outlined"
                 required
                 fullWidth
-                id={AddItemFormTextFieldIds.itemCountUnit}
+                id={ItemFormTextFieldIds.itemCountUnit}
                 label={textFieldLabels.itemUnits}
                 onChange={onFieldChanged}
                 autoFocus
@@ -233,11 +233,11 @@ function AddItemForm(props: AddItemFormProps) {
     function renderItemUnitFieldError(): JSX.Element {
         return (
             <TextField
-                name={AddItemFormTextFieldIds.itemCountUnit}
+                name={ItemFormTextFieldIds.itemCountUnit}
                 variant="outlined"
                 required
                 fullWidth
-                id={AddItemFormTextFieldIds.itemCountUnit}
+                id={ItemFormTextFieldIds.itemCountUnit}
                 label={textFieldLabels.itemUnits}
                 onChange={onFieldChanged}
                 autoFocus
@@ -259,11 +259,11 @@ function AddItemForm(props: AddItemFormProps) {
     function renderNormalItemTypeField(): JSX.Element {
         return (
             <TextField
-                name={AddItemFormTextFieldIds.itemType}
+                name={ItemFormTextFieldIds.itemType}
                 variant="outlined"
                 required
                 fullWidth
-                id={AddItemFormTextFieldIds.itemType}
+                id={ItemFormTextFieldIds.itemType}
                 label={textFieldLabels.itemType}
                 onChange={onFieldChanged}
                 autoFocus
@@ -275,11 +275,11 @@ function AddItemForm(props: AddItemFormProps) {
     function renderItemTypeFieldError(): JSX.Element {
         return (
             <TextField
-                name={AddItemFormTextFieldIds.itemType}
+                name={ItemFormTextFieldIds.itemType}
                 variant="outlined"
                 required
                 fullWidth
-                id={AddItemFormTextFieldIds.itemType}
+                id={ItemFormTextFieldIds.itemType}
                 label={textFieldLabels.itemType}
                 onChange={onFieldChanged}
                 autoFocus

@@ -2,6 +2,7 @@ import { Model } from "mongoose";
 import IItem from "../interfaces/modelinterfaces/IItem";
 import MyInventoryItem from "../models/usermodels/MyInventoryItem";
 import { MyInventoryItemProps } from "../props/MyInventoryItemProps";
+import { isItemInvalid } from "../models/usermodels/MyInventoryItem";
 
 class ItemService {
     private itemDB: Model<IItem>;
@@ -13,7 +14,7 @@ class ItemService {
 
     async addItem(item: MyInventoryItem): Promise<string> {
         return new Promise( (resolve, reject) => {
-            if (this.isItemInvalid(item)) { resolve(this.emptyItemErrorMessage) };
+            if (isItemInvalid(item)) { resolve(this.emptyItemErrorMessage) };
             this.itemDB.insertMany([
                 {
                     itemId: item.itemId,
@@ -62,8 +63,29 @@ class ItemService {
         });
     }
 
-    private isItemInvalid(item: MyInventoryItem): boolean {
-        return item.isItemInvalid();
+    async editItem(updatedItem: MyInventoryItem): Promise<string> {
+        return new Promise(async (resolve, reject) => {
+            if (isItemInvalid(updatedItem)) {
+                resolve("Invalid item");
+            }
+
+            await this.itemDB.findOneAndReplace(
+                {itemId: updatedItem.itemId}, 
+                {
+                    title: updatedItem.title,
+                    type: updatedItem.type,
+                    count: updatedItem.count.count,
+                    countUnit: updatedItem.count.units,
+                    description: updatedItem.description,
+                    owner: updatedItem.owner,
+                    itemId: updatedItem.itemId
+                }).then((result) => {
+                console.log("Result is " + JSON.stringify(result));
+                resolve("");
+            }).catch((reasonForRejection: string) => {
+                reject(reasonForRejection);
+            });
+        });
     }
 };
 

@@ -13,6 +13,7 @@ import LoginNetworkCallManager from './utils/LoginNetworkCallManager';
 import MyInventory from "./components/MyInventory";
 import AddItemPage from './components/additem/AddItemPage';
 import EditItemPage from './components/editItem/EditItemPage';
+import EditItemPageProps from './props/EditItemPageProps';
 
 function App() {
   function createSignUpPage() : JSX.Element {
@@ -42,9 +43,6 @@ function App() {
           />
           <Route exact path={RoutePath.addItem}
                  component={AddItemPage}
-          />
-          <Route exact path={RoutePath.editItem}
-            component={EditItemPage}
           />
         </Switch>
       </BrowserRouter>

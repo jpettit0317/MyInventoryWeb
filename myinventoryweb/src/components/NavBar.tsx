@@ -11,7 +11,7 @@ function NavBar({navBarTitle = "MyInventory"}: NavBarProps) {
             <AppBar position="static" className={navBarStyles.background}>
                 <Toolbar>
                     <Typography variant="h6" className={navBarStyles.title}>
-                       {navBarTitle} 
+                        {navBarTitle}
                     </Typography>
                 </Toolbar>
             </AppBar>

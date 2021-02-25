@@ -1,7 +1,7 @@
 import MyInventoryItem from "../../models/usermodels/MyInventoryItem";
 import { MyInventoryItemProps, createMyInventoryItemProps } from "../../props/MyInventoryItemProps";
-import AddItemViewModelErrors from "../../typeDefs/AddItemFormViewModelErrors";
-import AddItemFormViewModel from "../../viewmodels/AddItemFormViewModel";
+import ItemViewModelErrors from "../../typeDefs/ItemFormViewModelErrors";
+import ItemFormViewModel from "../../viewmodels/ItemFormViewModel";
 
 export const emptyItemProps = createMyInventoryItemProps();
 
@@ -25,16 +25,16 @@ export const emptyItem: MyInventoryItem = MyInventoryItem.createItem(emptyItemPr
 export const jonDoeItem: MyInventoryItem = MyInventoryItem.createItem(jonDoeProps);
 export const allErrorItem: MyInventoryItem = MyInventoryItem.createItem(allErrorProps);
 
-export const emptyErrors: AddItemViewModelErrors = {
+export const emptyErrors: ItemViewModelErrors = {
     itemTitleError: "",
     itemCountError: "",
     itemUnitError: "",
     itemTypeError: ""
 };
 
-export const allErrors: AddItemViewModelErrors = {
-    itemTitleError: AddItemFormViewModel.errors.emptyTitle,
-    itemTypeError: AddItemFormViewModel.errors.emptyType,
-    itemCountError: AddItemFormViewModel.errors.negativeCount,
-    itemUnitError: AddItemFormViewModel.errors.emptyUnit
+export const allErrors: ItemViewModelErrors = {
+    itemTitleError: ItemFormViewModel.errors.emptyTitle,
+    itemTypeError: ItemFormViewModel.errors.emptyType,
+    itemCountError: ItemFormViewModel.errors.negativeCount,
+    itemUnitError: ItemFormViewModel.errors.emptyUnit
 };

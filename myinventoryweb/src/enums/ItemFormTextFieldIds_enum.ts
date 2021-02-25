@@ -1,4 +1,4 @@
-enum AddItemFormTextFieldIds {
+enum ItemFormTextFieldIds {
     itemTitle ="itemTitle",
     itemDescription ="itemDescription",
     itemCount = "itemCount",
@@ -6,4 +6,4 @@ enum AddItemFormTextFieldIds {
     itemType = "itemType"
 };
 
-export default AddItemFormTextFieldIds;
+export default ItemFormTextFieldIds;
