@@ -1,15 +1,18 @@
 import { Card, CardContent, Typography, Button, CardActions } from "@material-ui/core";
 import React, { useEffect, useRef } from "react";
-import MyInventoryItem from "../models/usermodels/MyInventoryItem";
+import { logItem } from "../models/usermodels/MyInventoryItem";
 import useMyInventoryCardStyles from "../componentstyles/myinventoryitemcardstyles";
 import MyInventoryItemCardProps from "../props/MyInventoryItemCardProps";
-import { Link } from "react-router-dom";
-import RoutePath from "../enums/RoutePath_enum";
-import EditItemPage from "./editItem/EditItemPage";
 
 
 function MyInventoryItemCard(props: MyInventoryItemCardProps): JSX.Element {
     const classes = useMyInventoryCardStyles();
+
+    const buttonLabels = {
+        view : "View",
+        edit : "Edit",
+        delete : "Delete"
+    };
     
     function onEditPressed() {
         const itemCardIndex = props.index;
@@ -17,6 +20,11 @@ function MyInventoryItemCard(props: MyInventoryItemCardProps): JSX.Element {
         props.editItemCallBack(itemCardIndex);
     }
     
+    function onDeletePressed() {
+        console.log("Delete button was pressed for item ");
+        logItem(props.item);
+    }
+
     return (
         <Card className={classes.card}>
             <CardContent className={classes.cardContent}>
@@ -32,10 +40,13 @@ function MyInventoryItemCard(props: MyInventoryItemCardProps): JSX.Element {
             </CardContent>
             <CardActions>
                 <Button size="small" color="primary">
-                    View
+                    {buttonLabels.view}
                 </Button>
                 <Button size="small" color="primary" onClick={onEditPressed}>
-                    Edit
+                    {buttonLabels.edit}
+                </Button>
+                <Button size="small" color="secondary" onClick={onDeletePressed}>
+                    {buttonLabels.delete}
                 </Button>
             </CardActions>
         </Card>
