@@ -9,7 +9,8 @@ import {
     createLoginController,
     createAddItemController,
     createGetItemController,
-    createEditItemController
+    createEditItemController,
+    createDeleteItemController
 } from "./utils/serverHelper";
 import SignUpController from "./controllers/SignUpController";
 import { Connection } from "mongoose";
@@ -141,6 +142,29 @@ app.put(ApiURL.editItem, async (req, res) => {
     }).catch((rejectReason: string) => {
         console.log("Rejecting " + rejectReason);
         res.send(rejectReason);
+    });
+});
+
+app.post(ApiURL.deleteItem, async (req, res) => {
+    const itemProps: MyInventoryItemProps = {
+        title: req.body.title,
+        itemId: req.body.itemId,
+        owner: req.body.owner,
+        type: req.body.type,
+        count: req.body.count,
+        description: req.body.description
+    };
+
+    const itemToDelete = MyInventoryItem.createItem(itemProps);
+    console.log("In delete item");
+    logItem(itemToDelete);
+
+    const deleteItemController = createDeleteItemController(itemConnection);
+
+    deleteItemController.deleteItem(itemToDelete).then((value) => {
+        res.send("");
+    }).catch((reason: string) => {
+        res.send(reason);
     });
 });
 

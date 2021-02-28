@@ -17,6 +17,7 @@ import MyInventoryItem from '../models/usermodels/MyInventoryItem';
 import ItemService from '../services/ItemService';
 import MyInventoryController from '../controllers/MyInventoryController';
 import EditItemController from '../controllers/EditItemController';
+import DeleteItemController from '../controllers/DeleteItemController';
 
 export const portNumber: number = 4000;
 
@@ -61,6 +62,13 @@ export function createEditItemController(itemConnection: Connection): EditItemCo
     const itemService = new ItemService(itemModel);
 
     return new EditItemController(itemService);
+}
+
+export function createDeleteItemController(itemConnection: Connection): DeleteItemController {
+    const itemModel = createItemModel(itemConnection);
+    const itemService = new ItemService(itemModel);
+
+    return new DeleteItemController(itemService);
 }
 
 export function createGetItemController(connection: Connection): MyInventoryController {

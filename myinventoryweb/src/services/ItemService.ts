@@ -33,6 +33,22 @@ class ItemService {
         });
     }
 
+    async deleteItem(item: MyInventoryItem): Promise<string> {
+        return new Promise(async (resolve, reject) => {
+            if (isItemInvalid(item)) {
+                resolve("Invalid item");
+            }
+
+            await this.itemDB.findOneAndDelete(
+                { itemId: item.itemId }).then((result) => {
+                    console.log("Result is " + JSON.stringify(result));
+                    resolve("");
+                }).catch((reasonForRejection: string) => {
+                    reject(reasonForRejection);
+                });
+        });
+    }
+
     getItemByOwner(owner: string): Promise<MyInventoryItem[]> {
         return new Promise( (resolve, reject) => {
             this.itemDB.find({owner: owner}).then((value) => {

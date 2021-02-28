@@ -23,6 +23,7 @@ function MyInventoryItemCard(props: MyInventoryItemCardProps): JSX.Element {
     function onDeletePressed() {
         console.log("Delete button was pressed for item ");
         logItem(props.item);
+        props.deleteItem(props.item);
     }
 
     return (

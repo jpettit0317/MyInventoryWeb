@@ -25,6 +25,8 @@ import ApiURL from "../enums/ApiURL_enum";
 import EditPageDialog from "./editItem/EditPageDialog";
 import editItem from "../utils/EditItemNetworkRequestUtil";
 import FullApiURL from "../enums/FullApiURL_enum";
+import DeleteItemWarning from "./deleteItem/DeleteItemWarning";
+import deleteItemFromDB from "../utils/DeleteItemUtils";
 
 function MyInventory(): JSX.Element {
     const classes = useMyInventoryStyles();
@@ -36,6 +38,7 @@ function MyInventory(): JSX.Element {
     const [didItemsLoad, setDidItemsLoad] = useState(false);
     const [selectedItem, setSelectedItem] = useState<MyInventoryItem>(MyInventoryItem.createEmptyItem());
     const [shouldOpenDialog, setShouldOpenDialog] = useState(false);
+    const [shouldOpenDeleteWarning, setShouldOpenDeleteWarning] = useState(false);
 
     useEffect(() => {
         let mounted = true;
@@ -93,6 +96,30 @@ function MyInventory(): JSX.Element {
         window.location.reload();
     }
 
+    function deleteItem(item: MyInventoryItem) {
+        setSelectedItem(item);
+        console.log("Deleting item");
+        logItem(selectedItem);
+        setShouldOpenDeleteWarning(true);
+    }
+
+    function closeDeleteWarning() {
+        setShouldOpenDeleteWarning(false);
+        clearSelectedItem();
+    }
+
+    async function onOkay() {
+        console.log("Hit okay");
+        closeDeleteWarning();
+
+        await deleteItemFromDB(FullApiURL.deleteItem, selectedItem).then((value) => {
+            closeDeleteWarning();
+            reloadPage();
+        }).catch((reason: string) => {
+            console.log("Couldn't delete item");
+        });
+    }
+
     function redirectToEditItem() {
         setRedirect({ shouldPush: true, shouldRedirect: true, destination: RoutePath.editItem});
     }
@@ -118,9 +145,17 @@ function MyInventory(): JSX.Element {
             return <Redirect to={redirectDestination} />;
         }
     }
-   
+
+    function clearSelectedItem() {
+        setSelectedItem(MyInventoryItem.createEmptyItem());
+    }
+
     function shouldRenderEditDialog(): boolean {
         return !isItemInvalid(selectedItem) && shouldOpenDialog;
+    }
+
+    function shouldRenderDeleteWarning(): boolean {
+        return !isItemInvalid(selectedItem) && shouldOpenDeleteWarning;
     }
 
     function renderEditDialog(): JSX.Element {
@@ -132,6 +167,16 @@ function MyInventory(): JSX.Element {
                isOpen={shouldOpenDialog} 
             />
         );
+    }
+
+    function renderDeleteWarning(): JSX.Element {
+        return (
+            <DeleteItemWarning 
+               isOpen={shouldOpenDeleteWarning} 
+               onClose={closeDeleteWarning}
+               onOk={onOkay}
+            />
+        )
     }
 
     function getEditItemUrl(): string {
@@ -149,6 +194,7 @@ function MyInventory(): JSX.Element {
             <Container className={classes.cardGrid} maxWidth="md">
                 {shouldRedirect === true ? redirectToPage() : ""}
                 {shouldRenderEditDialog() && renderEditDialog()}
+                {shouldRenderDeleteWarning() && renderDeleteWarning()}
                 <Grid container spacing={4}>
                     <Grid item xs={12}>
                         <Button size="small" color="primary" onClick={onAddItemButtonPressed}>
@@ -175,6 +221,7 @@ function MyInventory(): JSX.Element {
                 index={index}
                 editItemCallBack={onEditButtonPressed}
                 key={itemToDisplay.itemId}
+                deleteItem={deleteItem}
             />
         );
     }
