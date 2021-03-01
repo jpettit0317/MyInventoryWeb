@@ -2,6 +2,7 @@ import MyInventoryItem from "../models/usermodels/MyInventoryItem";
 import axios from "axios";
 import FullApiURL from "../enums/FullApiURL_enum";
 import { removeDoubleQuotesFromString } from "./StringUtil";
+import AddItemResult from "../enums/AddItemResult_enum";
 
 class AddItemNetworkCallManager {
     private addItemUrl: string;
@@ -20,7 +21,7 @@ class AddItemNetworkCallManager {
             const stringified = JSON.stringify(res.data);
             const resultMessage = removeDoubleQuotesFromString(stringified);
 
-            if (resultMessage === "") {
+            if (resultMessage === AddItemResult.success) {
                 resolve("");
             } else {
                 reject(resultMessage);

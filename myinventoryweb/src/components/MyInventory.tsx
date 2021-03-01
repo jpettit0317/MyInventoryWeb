@@ -27,6 +27,7 @@ import editItem from "../utils/EditItemNetworkRequestUtil";
 import FullApiURL from "../enums/FullApiURL_enum";
 import DeleteItemWarning from "./deleteItem/DeleteItemWarning";
 import deleteItemFromDB from "../utils/DeleteItemUtils";
+import AddPageDialog from "./additem/AddPageDialog";
 
 function MyInventory(): JSX.Element {
     const classes = useMyInventoryStyles();
@@ -39,6 +40,7 @@ function MyInventory(): JSX.Element {
     const [selectedItem, setSelectedItem] = useState<MyInventoryItem>(MyInventoryItem.createEmptyItem());
     const [shouldOpenDialog, setShouldOpenDialog] = useState(false);
     const [shouldOpenDeleteWarning, setShouldOpenDeleteWarning] = useState(false);
+    const [shouldOpenAddItemDialog, setShouldOpenAddItemDialog] = useState(false);
 
     useEffect(() => {
         let mounted = true;
@@ -92,6 +94,11 @@ function MyInventory(): JSX.Element {
         setShouldOpenDialog(false);
     }
 
+    function closeAddDialogue() {
+        setShouldOpenAddItemDialog(false);
+        reloadPage();
+    }
+
     function reloadPage() {
         window.location.reload();
     }
@@ -125,8 +132,17 @@ function MyInventory(): JSX.Element {
     }
 
     function onAddItemButtonPressed() {
-        console.log("Add item button was pressed!");
-        setRedirect({shouldPush: true, shouldRedirect: true, destination: RoutePath.addItem});
+        setShouldOpenAddItemDialog(true);
+    }
+
+    function renderAddItemDialog(): JSX.Element {
+        return (
+            <AddPageDialog 
+               onClose={closeAddDialogue} 
+               onAdd={closeAddDialogue} 
+               isOpen={shouldOpenAddItemDialog}
+            />
+        );
     }
 
     function redirectToPage(): JSX.Element {
@@ -195,6 +211,7 @@ function MyInventory(): JSX.Element {
                 {shouldRedirect === true ? redirectToPage() : ""}
                 {shouldRenderEditDialog() && renderEditDialog()}
                 {shouldRenderDeleteWarning() && renderDeleteWarning()}
+                {shouldOpenAddItemDialog && renderAddItemDialog()}
                 <Grid container spacing={4}>
                     <Grid item xs={12}>
                         <Button size="small" color="primary" onClick={onAddItemButtonPressed}>

@@ -1,12 +1,12 @@
 import ItemCount from "../typeDefs/ItemCount";
-import { RouteComponentProps } from 'react-router-dom';
-
-interface AddItemPageProps extends RouteComponentProps {
+interface AddItemPageProps {
     itemTitle: string;
     itemDescription: string;
     itemCount: ItemCount;
     itemType: string;
     itemOwner: string;
+    onAdd: () => void;
+    onClose: () => void;
 };
 
 export default AddItemPageProps;
