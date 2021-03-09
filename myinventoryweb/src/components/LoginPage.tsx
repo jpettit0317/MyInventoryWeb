@@ -59,7 +59,7 @@ const LoginPage: React.FC<LoginPageProps> = props => {
             setLoginErrorState(false, "");
             console.log("Transitioning to MyInventory page.");
             createCookie(result);
-            //setRedirect({destination: RoutePath.myinventory, shouldRedirect: true});
+            setRedirect({destination: RoutePath.myinventory, shouldRedirect: true});
         }).catch( (rejectReason: string) => {
             setLoginErrorState(true, rejectReason);
         });
@@ -73,7 +73,8 @@ const LoginPage: React.FC<LoginPageProps> = props => {
 
     function redirect() {
         if (shouldRedirectToMyInventory) {
-            return <Redirect push to={redirectDestination} />
+            console.log("Redirecting to " + redirectDestination);
+            return <Redirect to={redirectDestination} />
         }
     }
 
