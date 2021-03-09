@@ -8,6 +8,7 @@ import { UserService } from "../../services/UserService";
 import PasswordService from "../../services/PasswordService";
 import UserSignUpInfo from "../../interfaces/modelinterfaces/UserSignUpInfo";
 import UserPasswordInfo from "../../interfaces/modelinterfaces/UserPasswordInfo";
+import SessionService from "../../services/SessionService";
 
 
 export const jonUser: UserSignUpInfo = {
@@ -62,13 +63,13 @@ export function verifyFullName(actualFullName: FullName, expectedFullName: FullN
     expect(actualFullName.lastName).toBe(expectedFullName.lastName);
 }
 
-export function buildEmptySignUpController(userService: UserService, passwordService: PasswordService): SignUpController {
+export function buildEmptySignUpController(userService: UserService, passwordService: PasswordService, sessionService: SessionService): SignUpController {
     const emptySignUpProps = buildProps(emptyProps);
-    return SignUpController.createSignUpController(emptySignUpProps, userService, passwordService);
+    return SignUpController.createSignUpController(emptySignUpProps, userService, passwordService, sessionService);
 }
 
-export function buildSignUpController(props: SignUpControllerProps, userService: UserService, passwordService: PasswordService): SignUpController {
-    return SignUpController.createSignUpController(props, userService, passwordService);
+export function buildSignUpController(props: SignUpControllerProps, userService: UserService, passwordService: PasswordService, sessionService: SessionService): SignUpController {
+    return SignUpController.createSignUpController(props, userService, passwordService, sessionService);
 }
 
 function createUserModel(connection: Connection): Model<IUserInfo> {

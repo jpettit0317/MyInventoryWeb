@@ -3,6 +3,7 @@ import UserSignUpInfo from "../interfaces/modelinterfaces/UserSignUpInfo";
 import IUserInfo from "../interfaces/modelinterfaces/UserInfo";
 import { v4 as uuidv4 } from 'uuid';
 import { rejects } from "assert";
+import CreateUserResult from "../enums/CreateUserResult_enum";
 
 export class UserService {
     private userDB: Model<IUserInfo>
@@ -24,7 +25,7 @@ export class UserService {
            .then( (result) => {
                if (result === this.usernameExistsMessage) {
                    doesUserNameExist = true;
-                   resultMessage = this.usernameExistsMessage;
+                   resultMessage = CreateUserResult.usernameExists;
                }            
             })
            .catch( (error) => {

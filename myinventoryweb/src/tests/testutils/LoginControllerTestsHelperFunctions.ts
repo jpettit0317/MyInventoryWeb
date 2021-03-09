@@ -1,13 +1,14 @@
 import LoginController from "../../controllers/LoginController";
 import UserPasswordInfo from "../../interfaces/modelinterfaces/UserPasswordInfo";
 import PasswordService from "../../services/PasswordService";
+import SessionService from "../../services/SessionService";
 
-export function createLoginControllerForTest(login: UserPasswordInfo, passwordDB: PasswordService) : LoginController {
-    return LoginController.createLoginController(login, passwordDB);
+export function createLoginControllerForTest(login: UserPasswordInfo, passwordDB: PasswordService, sessionDB: SessionService) : LoginController {
+    return LoginController.createLoginController(login, passwordDB, sessionDB);
 }
 
-export function createBlankUsernameAndPasswordController(passwordDB: PasswordService): LoginController {
-    return LoginController.createLoginController(undefined, passwordDB);
+export function createBlankUsernameAndPasswordController(passwordDB: PasswordService, sessionDB: SessionService): LoginController {
+    return LoginController.createLoginController(undefined, passwordDB, sessionDB);
 }
 
 export function convertToUserPasswordInfo(username: string = "", password: string = ""): UserPasswordInfo {

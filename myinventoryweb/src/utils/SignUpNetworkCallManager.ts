@@ -14,14 +14,16 @@ class SignUpNetworkCallManager extends NetworkCallManager {
 
     async sendCreateUserRequest(user: {username: string, password: string, 
         email: string, firstName: string, lastName: string}): Promise<string> {
-        const res = await axios.post(this.urlString, user);
-        const resultMessage = removeDoubleQuotesFromString(JSON.stringify(res.data));
-        return new Promise((resolve, reject) => {
-            if (resultMessage === "") {
-                resolve("");
-            } else {
-                reject(resultMessage);
-            }
+        return new Promise(async (resolve, reject) => {
+            await axios.post(this.urlString, user).then(response => {
+                const result: {result: boolean, message: string} = JSON.parse(JSON.stringify(response.data));
+
+                if (result.result) {
+                    resolve(result.message);
+                } else {
+                    reject(result.message);
+                }
+            });
         });
     }
 }

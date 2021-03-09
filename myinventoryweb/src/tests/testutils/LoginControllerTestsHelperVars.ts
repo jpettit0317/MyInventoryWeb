@@ -26,5 +26,8 @@ export const userDoesntExist: string = "User doesn't exist";
 export const integrationLoginControllerTestInfo = {
     connectionString: "mongodb://localhost:27017/loginControllerTests",
     collectionName: "loginControllerTests",
-    refName: "TestLoginPasswords"
+    refName: "TestLoginPasswords",
+    sessionConnectionString: "mongodb://localhost:27017/loginControllerTests",
+    sessionCollection: "loginControllerSessions",
+    sessionRefName: "TestLoginControllerSessions"
 };

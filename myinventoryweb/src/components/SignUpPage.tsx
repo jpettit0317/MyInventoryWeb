@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { withRouter, RouteComponentProps, Redirect } from 'react-router-dom';
 import SignUpPageViewModel from '../viewmodels/SignUpPageViewModel';
 import Avatar from '@material-ui/core/Avatar';
@@ -23,6 +23,7 @@ import FullApiURL from "../enums/FullApiURL_enum";
 import NetworkCallManager from "../interfaces/modelinterfaces/NetworkCallManager";
 import { removeDoubleQuotesFromString } from "../utils/StringUtil";
 import RoutePath from "../enums/RoutePath_enum";
+import getCookieValue from "../utils/CookieUtils";
 
 function Copyright() {
     return (
@@ -100,6 +101,16 @@ const SignUpPage: React.FC<SignUpPageProps> = props => {
     const [shouldRedirect, setShouldRedirect] = useState(false);
     const [redirectDestination, setRedirectDestination] = useState(RoutePath.home);
 
+
+    useEffect(() => {
+        const sessionId = getCookieValue("sessionId");
+        if (sessionId) {
+            console.log("The session id is " + sessionId);
+        } else {
+            console.log("Session id doesn't exist");
+        }
+    }, []);
+
     async function onClick() {
         const viewModelProps: SignUpViewModelProps = {
             username: username,
@@ -127,6 +138,7 @@ const SignUpPage: React.FC<SignUpPageProps> = props => {
 
         await signUpPageViewModel.signUpNetworkCallManager.sendCreateUserRequest(userInfo).then((result) => {
             console.log("No error found");
+            setSessionCookie(result);
             setRedirect({destination: RoutePath.myinventory, shouldRedirect: true});
         }).catch((error) => {
             const errorValue = removeDoubleQuotesFromString(String(error));
@@ -136,6 +148,11 @@ const SignUpPage: React.FC<SignUpPageProps> = props => {
                 setUsernameError(errorValue);
             }
         });
+    }
+
+    function setSessionCookie(id: string) {
+        console.log("Setting cookie id to " + id);
+        document.cookie = `sessionId=${id}`;
     }
 
     function updateErrors(errors: SignUpViewErrors) {

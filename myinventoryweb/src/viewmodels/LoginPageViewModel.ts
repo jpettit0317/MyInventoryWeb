@@ -55,8 +55,12 @@ class LoginPageViewModel extends LoginViewModel {
     async validateUserLogin(): Promise<string> {
         const providedLogin = this.getUserLoginInfo();
         return new Promise(async (resolve, reject) => {
-            await this.loginNetworkCallManager.sendVerifyUserRequest(providedLogin).then(() => {
-                resolve("");
+            await this.loginNetworkCallManager.sendVerifyUserRequest(providedLogin).then((result) => {
+                if (result.result) {
+                    resolve(result.reason);
+                } else {
+                    reject(result.reason);
+                }
             }).catch((reason: string) => {
                 reject(reason);
             });

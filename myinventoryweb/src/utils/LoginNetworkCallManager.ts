@@ -11,17 +11,15 @@ class LoginNetworkCallManager extends NetworkCallManager {
         return new LoginNetworkCallManager(newUrl);
     }
 
-    async sendVerifyUserRequest(loginInfo: UserPasswordInfo): Promise<string> {
+    async sendVerifyUserRequest(loginInfo: UserPasswordInfo): Promise<{result: boolean, reason: string}> {
         return new Promise(async (resolve, reject) => {
             await axios.post(this.urlString, loginInfo).then( (value) => {
-                const resultMessage = JSON.stringify(value.data).replace(/"/g, "");
-                if (resultMessage !== "") {
-                    reject(resultMessage);
-                } else {
-                    resolve("");
-                }
+                const result: {result: boolean, reason: string} = JSON.parse(JSON.stringify(value.data));
+                console.log(`In loginnetworkcallmanager ${result.result}, ${result.reason}`);
+                resolve(result);
             }).catch((reason) => {
                 console.log("The reason for failure is " + String(reason));
+                reject({result: false, reason: String(reason)});
             });
         });
     }

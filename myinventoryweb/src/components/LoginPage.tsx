@@ -42,6 +42,11 @@ const LoginPage: React.FC<LoginPageProps> = props => {
         return LoginPageViewModel.createLoginPageViewModel(username, password, loginNetworkCallManager);
     }
 
+    function createCookie(sessionId: string) {
+        console.log("In login page session id is " + sessionId);
+        document.cookie = `sessionId=${sessionId}`;
+    }
+
     async function onSubmit() {
         const loginPageViewModel = createLoginPageViewModel();
         let result = loginPageViewModel.reportError();
@@ -50,10 +55,11 @@ const LoginPage: React.FC<LoginPageProps> = props => {
             return;
         }
 
-        await loginPageViewModel.validateUserLogin().then(() => {
+        await loginPageViewModel.validateUserLogin().then((result) => {
             setLoginErrorState(false, "");
             console.log("Transitioning to MyInventory page.");
-            setRedirect({destination: RoutePath.myinventory, shouldRedirect: true});
+            createCookie(result);
+            //setRedirect({destination: RoutePath.myinventory, shouldRedirect: true});
         }).catch( (rejectReason: string) => {
             setLoginErrorState(true, rejectReason);
         });

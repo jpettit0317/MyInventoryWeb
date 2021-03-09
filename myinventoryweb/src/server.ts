@@ -20,12 +20,14 @@ import { MyInventoryItemProps } from "./props/MyInventoryItemProps";
 import MyInventoryItem, { logItem } from "./models/usermodels/MyInventoryItem";
 import AddItemController from "./controllers/AddItemController";
 import { createItemConnection } from "./utils/AddItemUtils";
+import { createSessionConnection } from "./utils/SessionServiceUtils";
 
 const app = express();
 
 let userConnection: Connection;
 let passwordConnection: Connection;
 let itemConnection: Connection;
+let sessionConnection: Connection;
 
 app.use(express.json());
 app.use(express.urlencoded({
@@ -37,6 +39,7 @@ app.listen(portNumber, () => {
     userConnection = createUserConnection();
     passwordConnection = createPasswordConnection();
     itemConnection = createItemConnection();
+    sessionConnection = createSessionConnection();
 });
 
 app.post(ApiURL.createUser, async (req, res) => {
@@ -50,11 +53,11 @@ app.post(ApiURL.createUser, async (req, res) => {
         userId: ""
     };
 
-    const signUpController = createSignUpController(userSignUpInfo, userConnection, passwordConnection);
+    const signUpController = createSignUpController(userSignUpInfo, userConnection, passwordConnection, sessionConnection);
 
     signUpController.createUser(userSignUpInfo).then( (result) => {
         console.log(`In then block sending ${result.message}`);
-        res.send(result.message);
+        res.send(result);
     }).catch( (reason: {result: boolean, message: string}) => {
         console.log(`In catch block sending ${reason.message}`);
         res.send(reason.message);
@@ -67,15 +70,16 @@ app.post(ApiURL.verifyLogin, (req, res) => {
         password: String(req.body.password)
     };
 
-    const loginController = createLoginController(providedLogin, passwordConnection);
+    const loginController = createLoginController(providedLogin, passwordConnection, sessionConnection);
 
-    loginController.verifyUserLogin().then((verifyResult: string) => {
-        if (verifyResult === "") {
+    loginController.verifyUserLogin().then((result) => {
+        if (result.result) {
             console.log("Password is correct");
-            res.send("");
+            console.log(`Sending Result: ${result.result}, Message: ${result.reason}`);
+            res.send(result);
         } else {
             console.log("Invalid username or password");
-            res.send("Username or password is invalid.");
+            res.send(result);
         }
     }).catch(() => {
         console.log("An error as occured");
