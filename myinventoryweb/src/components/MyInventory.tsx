@@ -28,6 +28,7 @@ import FullApiURL from "../enums/FullApiURL_enum";
 import DeleteItemWarning from "./deleteItem/DeleteItemWarning";
 import deleteItemFromDB from "../utils/DeleteItemUtils";
 import AddPageDialog from "./additem/AddPageDialog";
+import getCookieValue, { deleteCookie } from "../utils/CookieUtils";
 
 function MyInventory(): JSX.Element {
     const classes = useMyInventoryStyles();
@@ -61,11 +62,39 @@ function MyInventory(): JSX.Element {
             });
         };
 
-        fetchUserItems();
+        async function checkForValidCookie(sessionId: string): Promise<{result: boolean, reason: string}> {
+            return new Promise( async (resolve, reject) => {
+                await MyInventoryNetworkCallManager.checkForValidCookie(sessionId).then(result => {
+                    console.log("Cookie is valid " + result.reason);
+                    resolve(result);
+                }).catch((result: {result: boolean, reason: string}) => {
+                    console.log("Cookie is invalid " + result.reason);
+                    reject(result);
+                });
+            });
+        }
+        
+        const sessionId = getCookieValue("sessionId");
 
-        return  () => {
-            mounted = false;
-        };
+        if (sessionId) {
+            console.log("The session id is " + sessionId);
+            checkForValidCookie(sessionId).then(() => {
+                fetchUserItems();
+            }).catch(() => {
+                console.log("Deleting session ");
+                MyInventoryNetworkCallManager.deleteSession(sessionId).then((result) => {
+                    if (result.result) {
+                        console.log("Setting delete ")
+                        setRedirect({shouldPush: false, shouldRedirect: true, destination: RoutePath.login});
+                        deleteCookie("sessionId");
+                    }
+                }).catch((reasonForRejection: {result: boolean, reason: string}) => {
+                    console.log("Redirecting to login because " + reasonForRejection.reason);
+                    setRedirect({ shouldPush: false, shouldRedirect: true, destination: RoutePath.login });
+                    deleteCookie("sessionId");
+                });
+            });
+        }
     }, []);
 
     function onEditButtonPressed(index: number) {
@@ -244,8 +273,11 @@ function MyInventory(): JSX.Element {
     }
 
     function renderLoading(): JSX.Element {
+        console.log("Redirect destination is " + redirectDestination);
+        console.log("Redirect " + shouldRedirect);
         return (
             <div>
+                { shouldRedirect === true ? redirectToPage() : ""}
                 Loading...
             </div>
         );

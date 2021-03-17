@@ -10,7 +10,9 @@ import {
     createAddItemController,
     createGetItemController,
     createEditItemController,
-    createDeleteItemController
+    createDeleteItemController,
+    createSessionExpiredController,
+    createDeleteSessionController
 } from "./utils/serverHelper";
 import SignUpController from "./controllers/SignUpController";
 import { Connection } from "mongoose";
@@ -21,6 +23,7 @@ import MyInventoryItem, { logItem } from "./models/usermodels/MyInventoryItem";
 import AddItemController from "./controllers/AddItemController";
 import { createItemConnection } from "./utils/AddItemUtils";
 import { createSessionConnection } from "./utils/SessionServiceUtils";
+import SessionExpiredController from "./controllers/SessionExpiredController";
 
 const app = express();
 
@@ -115,6 +118,45 @@ app.get(ApiURL.getItems, async (req, res) => {
 
     await getItemsController.getItems(owner).then((itemsAsString) => {
         res.send(itemsAsString);
+    });
+});
+
+app.get(ApiURL.getSessionExpDate, async (req, res) => {
+    const sessionId = req.params.sessionId;
+    const expired = "Session Expired";
+    const sessionIsValidMessage = "Session is valid";
+
+    console.log("Sent session id is " + sessionId);
+
+    const sessionExpiredController = createSessionExpiredController(sessionConnection);
+
+    sessionExpiredController.hasSessionExpired(sessionId).then((result) => {
+        if (result) {
+            res.send(expired);
+        } else {
+            res.send(sessionIsValidMessage);
+        }
+    }).catch(() => {
+        res.send(expired);
+    });
+});
+
+app.post(ApiURL.deleteSession, async (req, res) => {
+    const sessionId = req.body.sessionId;
+
+    console.log("request body: " + String(req.body));
+    console.log("Deleting session with id " + sessionId);
+
+    const deleteSessionController = createDeleteSessionController(sessionConnection);
+
+    deleteSessionController.deleteSessionWithId(sessionId).then((result) => {
+        if (result.result) {
+            console.log("Deleting id " + sessionId);
+            res.send(result.reason);
+        }
+    }).catch((reasonForRejection: {result: boolean, reason: string}) => {
+        console.log("Failed to delete " + sessionId);
+        res.send(reasonForRejection.reason);
     });
 });
 

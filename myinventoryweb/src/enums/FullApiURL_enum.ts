@@ -3,7 +3,8 @@ enum FullApiURL {
     verifyUser = "http://localhost:4000/api/verifyUserLogin",
     addItem = "http://localhost:4000/api/addItem",
     editItem = "http://localhost:4000/api/editItem",
-    deleteItem = "http://localhost:4000/api/deleteItem"
+    deleteItem = "http://localhost:4000/api/deleteItem",
+    deleteSession = "http://localhost:4000/api/deleteSession"
 };
 
 export default FullApiURL;

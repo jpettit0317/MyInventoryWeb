@@ -36,8 +36,8 @@ class LoginController {
                 } else {
                     resolve(result);
                 }
-            }).catch(() => {
-                reject("Rejected");
+            }).catch((reason: string) => {
+                reject("Rejected because " + reason);
             });
         });
     }

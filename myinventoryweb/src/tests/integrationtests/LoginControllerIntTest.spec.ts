@@ -47,6 +47,7 @@ describe('LoginController tests', () => {
         );
 
         passwordService = PasswordService.createPasswordService(TestPasswords);
+        sessionService = new SessionService(TestSessions);
 
         await passwordService.createUserPasswordEntry(TestHelperVars.jonLoginInfo).then(() => {
             console.log("Saved user");
@@ -102,11 +103,12 @@ describe('LoginController tests', () => {
         it('verifyUserLogin', async (done: jest.DoneCallback) => {
             const sut = TestHelperFuncs.createLoginControllerForTest(
                 TestHelperVars.jonLoginInfo,
-                passwordService
+                passwordService,
+                sessionService
             );
 
             await sut.verifyUserLogin().then((result) => {
-                expect(result).toBe("");
+                expect(result.reason).not.toBe("");
             }).catch((reason: string) => {
                 done.fail("Failed because " + reason);
             });
@@ -118,11 +120,12 @@ describe('LoginController tests', () => {
             async (done: jest.DoneCallback) => {
                 const sut = TestHelperFuncs.createLoginControllerForTest(
                     TestHelperVars.invalidJonLoginInfo,
-                    passwordService
+                    passwordService,
+                    sessionService
                 );
 
                 await sut.verifyUserLogin().then( (result) => {
-                    expect(result).toBe(VerifyUserMessages.passwordsDontMatch);
+                    expect(result.reason).toBe(VerifyUserMessages.passwordsDontMatch);
                 }).catch((reason: string) => {
                     done.fail("Failed because " + reason);
                 });
@@ -134,11 +137,12 @@ describe('LoginController tests', () => {
            async (done: jest.DoneCallback) => {
                const sut = TestHelperFuncs.createLoginControllerForTest(
                    TestHelperVars.janeLoginInfo,
-                   passwordService
+                   passwordService,
+                   sessionService
                );
 
                await sut.verifyUserLogin().then( (result) => {
-                   expect(result).toBe(VerifyUserMessages.userDoesntExist);
+                   expect(result.reason).toBe(VerifyUserMessages.userDoesntExist);
                }).catch((reason: string) => {
                    done.fail("Failed because " + reason);
                });

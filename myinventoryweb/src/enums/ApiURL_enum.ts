@@ -5,7 +5,9 @@ enum ApiURL {
     addItem="/api/addItem",
     getItems="/api/getItems/:owner",
     editItem="/api/editItem",
-    deleteItem="/api/deleteItem"
+    deleteItem="/api/deleteItem",
+    getSessionExpDate="/api/getExpirationDate/:sessionId",
+    deleteSession = "/api/deleteSession"
 };
 
 export default ApiURL;

@@ -21,6 +21,8 @@ import DeleteItemController from '../controllers/DeleteItemController';
 import SessionService from '../services/SessionService';
 import ISession from '../interfaces/modelinterfaces/ISession';
 import { createSessionModel } from "../utils/SessionServiceUtils";
+import SessionExpiredController from '../controllers/SessionExpiredController';
+import DeleteSessionController from '../controllers/DeleteSessionController';
 
 export const portNumber: number = 4000;
 
@@ -63,6 +65,20 @@ export function createAddItemController(newItemProps: MyInventoryItemProps, conn
     const itemService = new ItemService(itemModel);
 
     return new AddItemController(newItem, itemService);
+}
+
+export function createSessionExpiredController(connection: Connection): SessionExpiredController {
+    const sessionModel = createSessionModel(connection);
+    const sessionService = new SessionService(sessionModel);
+
+    return new SessionExpiredController(sessionService);
+}
+
+export function createDeleteSessionController(connection: Connection): DeleteSessionController {
+    const sessionModel = createSessionModel(connection);
+    const sessionService = new SessionService(sessionModel);
+
+    return new DeleteSessionController(sessionService);
 }
 
 export function createEditItemController(itemConnection: Connection): EditItemController {

@@ -1,4 +1,6 @@
 import { Model } from "mongoose";
+import { resolve } from "path";
+import DeleteSessionControllerResult from "../enums/DeleteSessionControllerResult_enum";
 import ISession from "../interfaces/modelinterfaces/ISession";
 import Session from "../models/usermodels/Session";
 
@@ -38,6 +40,60 @@ class SessionService {
             });
         });
 
+    }
+
+    getSession(sessionId: string): Promise<Session | null> {
+        console.log("Getting session with " + sessionId);
+        return new Promise(async (resolve, reject) => {
+            await this.sessionDB.findOne({sessionId: sessionId}).then((iSession) => {
+                if (iSession) {
+                    console.log("Got session");
+                    const session = this.createUserSession(iSession);
+                    this.logSession(session);
+                    resolve(session);
+                } else {
+                    console.log("Couldn't find sessionId: " + sessionId);
+                    resolve(null);
+                }
+            }).catch((reasonForRejection: string) => {
+                console.log("The reason for rejection is " + reasonForRejection);
+                reject(null);
+            })
+        });
+    }
+
+    hasSessionExpired(sessionId: string, currentDate: Date): Promise<boolean> {
+        return new Promise(async (resolve, reject) => {
+            await this.getSession(sessionId).then((session) => {
+                if (session) {
+                    resolve(session.hasExpired(currentDate));
+                } else {
+                    resolve(true);
+                }
+            }).catch((reasonForRejection) => {
+                console.log("In has session expired " + reasonForRejection);
+                reject(true);
+            });
+        });
+    }
+
+    deleteSessionWithId(id: string): Promise<{ result: boolean, reason: string }> {
+        return new Promise(async (resolve, reject) => {
+            await this.sessionDB.findOneAndDelete({sessionId: id }).then(() => {
+                resolve({ result: true, reason: DeleteSessionControllerResult.deletedSession});
+            }).catch((reasonForRejection: string) => {
+                reject({ result: false, reason: reasonForRejection });
+            });
+        });
+
+    }
+
+    createUserSession(iSession: ISession): Session {
+        return Session.createSessionFromISession(iSession);
+    }
+
+    logSession(session: Session) {
+        console.log(`Id: ${session.sessionId}, User: ${session.user}, Exp Date: ${session.expirationDate}`);
     }
 }
 
