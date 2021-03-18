@@ -46,11 +46,10 @@ function MyInventory(): JSX.Element {
     useEffect(() => {
         let mounted = true;
 
-        const fetchUserItems = async () => {
-            await MyInventoryNetworkCallManager.getItemsForUser("jpettit0317").then((value) => {
+        const fetchUserItems = async (sessionId: string) => {
+            await MyInventoryNetworkCallManager.getItemsForUser(sessionId).then((value) => {
                 const retreivedItems: MyInventoryItem[] = JSON.parse(value);
                 console.log("Items are " + value);
-                console.log(`Item one count is ${retreivedItems[0].count.count} ${retreivedItems[0].count.units}`);
                 
                 if (!mounted) { return }
                 
@@ -59,6 +58,7 @@ function MyInventory(): JSX.Element {
 
             }).catch((reasonForRejection) => {
                 console.log(reasonForRejection);
+                setDidItemsLoad(true);
             });
         };
 
@@ -79,7 +79,7 @@ function MyInventory(): JSX.Element {
         if (sessionId) {
             console.log("The session id is " + sessionId);
             checkForValidCookie(sessionId).then(() => {
-                fetchUserItems();
+                fetchUserItems(sessionId);
             }).catch(() => {
                 console.log("Deleting session ");
                 MyInventoryNetworkCallManager.deleteSession(sessionId).then((result) => {

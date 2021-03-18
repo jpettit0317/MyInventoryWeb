@@ -2,10 +2,11 @@ import { Model } from "mongoose";
 import IItem from "../interfaces/modelinterfaces/IItem";
 import MyInventoryItem from "../models/usermodels/MyInventoryItem";
 import ItemService from "../services/ItemService";
+import SessionService from "../services/SessionService";
 
 class AddItemController {
     private item: MyInventoryItem;
-    private readonly itemService: ItemService;
+    private itemService: ItemService;
 
     constructor(item: MyInventoryItem, newItemService: ItemService) {
         this.item = item;

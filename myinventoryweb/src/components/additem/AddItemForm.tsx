@@ -9,6 +9,7 @@ import { MyInventoryItemProps, createMyInventoryItemProps } from "../../props/My
 import ItemFormViewModel from "../../viewmodels/ItemFormViewModel";
 import ItemFormViewModelErrors from "../../typeDefs/ItemFormViewModelErrors";
 import { isStringNotANumber } from "../../utils/StringUtil";
+import getCookieValue from "../../utils/CookieUtils";
 
 function AddItemForm(props: AddItemFormProps) {
     const classes = useAddItemPageStyles();
@@ -37,8 +38,15 @@ function AddItemForm(props: AddItemFormProps) {
     let [itemTypeError, setItemTypeError] = useState("");
 
     function onAddButtonClicked() {
+        const sessionId = getCookieValue("sessionId");
+        
+        if (!sessionId) {
+            return;
+        }
+
+        console.log("On add button clicked " + sessionId!);
         const itemCountWithUnit: ItemCount = {count: itemCount, units: itemUnits};
-        const itemProps = createMyInventoryItemProps(itemTitle, undefined, "jpettit0317",
+        const itemProps = createMyInventoryItemProps(itemTitle, undefined, sessionId!,
             itemType, itemCountWithUnit, itemDescription);
         
         const item = MyInventoryItem.createItem(itemProps);

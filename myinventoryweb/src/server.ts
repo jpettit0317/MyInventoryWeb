@@ -24,6 +24,8 @@ import AddItemController from "./controllers/AddItemController";
 import { createItemConnection } from "./utils/AddItemUtils";
 import { createSessionConnection } from "./utils/SessionServiceUtils";
 import SessionExpiredController from "./controllers/SessionExpiredController";
+import { createNewItemProps, getUsername } from "./utils/UserSessionUtils";
+import AddItemResult from "./enums/AddItemResult_enum";
 
 const app = express();
 
@@ -100,25 +102,35 @@ app.post(ApiURL.addItem, async (req, res) => {
         description: req.body.description
     };
 
-    const addItemController = createAddItemController(itemProps, itemConnection);
+    await createNewItemProps(itemProps, sessionConnection).then(async (result) => {
+        console.log("The props are " + JSON.stringify(result.props));
+        const addItemController = createAddItemController(result.props, itemConnection);
 
-    await addItemController.addItem().then((addResult: string) => {
-        console.log("Resolving " + addResult);
-        res.send(addResult);
-    }).catch((rejectReason: string) => {
-        console.log("Rejecting " + rejectReason);
-        res.send(rejectReason);
+        await addItemController.addItem().then((addResult: string) => {
+            console.log("Resolving " + addResult);
+            res.send(addResult);
+        }).catch((rejectReason: string) => {
+            console.log("Rejecting " + rejectReason);
+            res.send(rejectReason);
+        });
+    }).catch(() => {
+        res.send(AddItemResult.failedToFetchUser);
     });
 });
 
 app.get(ApiURL.getItems, async (req, res) => {
     const owner = req.params.owner;
 
-    const getItemsController = createGetItemController(itemConnection);
+    await getUsername(owner, sessionConnection).then(async (result) => {
+        const getItemsController = createGetItemController(itemConnection);
 
-    await getItemsController.getItems(owner).then((itemsAsString) => {
-        res.send(itemsAsString);
+        await getItemsController.getItems(result.user).then((itemsAsString) => {
+            res.send(itemsAsString);
+        });
+    }).catch(() => {
+        res.send("");
     });
+    
 });
 
 app.get(ApiURL.getSessionExpDate, async (req, res) => {

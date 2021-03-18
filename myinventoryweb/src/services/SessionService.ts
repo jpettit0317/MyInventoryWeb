@@ -85,7 +85,20 @@ class SessionService {
                 reject({ result: false, reason: reasonForRejection });
             });
         });
+    }
 
+    getUserWithId(id: string): Promise<{result: boolean, user: string}> {
+        return new Promise(async (resolve, reject) => {
+            await this.sessionDB.findOne({sessionId: id}).then((session) => {
+                if (session) {
+                    resolve({ result: true, user: session.user })
+                } else {
+                    resolve({result: false, user: ""});
+                }
+            }).catch((reason: string) => {
+                reject({result: false, user: ""});
+            });
+        });
     }
 
     createUserSession(iSession: ISession): Session {
