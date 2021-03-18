@@ -182,47 +182,58 @@ app.put(ApiURL.editItem, async (req, res) => {
         description: req.body.description
     };
 
-    const updatedItem = MyInventoryItem.createItem(itemProps);
+    await createNewItemProps(itemProps, sessionConnection).then(async (result) => {
+        console.log("The props are " + JSON.stringify(result.props));
 
-    console.log("Updated item on backend is ");
-    logItem(updatedItem);
+        const updatedItem = MyInventoryItem.createItem(result.props);
 
-    const editItemController = createEditItemController(itemConnection);
+        console.log("Updated item on backend is ");
+        logItem(updatedItem);
 
-    editItemController.editItem(updatedItem).then((value) => {
-        if (value === "") {
-            console.log("Nothing went wrong");
-            res.send("");
-        } else {
-            console.log("Error is " + value);
-            res.send("Error: " + value);
-        }
-    }).catch((rejectReason: string) => {
-        console.log("Rejecting " + rejectReason);
-        res.send(rejectReason);
+        const editItemController = createEditItemController(itemConnection);
+
+        editItemController.editItem(updatedItem).then((value) => {
+            if (value === "") {
+                console.log("Nothing went wrong");
+                res.send("");
+            } else {
+                console.log("Error is " + value);
+                res.send("Error: " + value);
+            }
+        }).catch((rejectReason: string) => {
+            console.log("Rejecting " + rejectReason);
+            res.send(rejectReason);
+        });
+    }).catch(() => {
+        res.send("Failed to get user from session");
     });
 });
 
 app.post(ApiURL.deleteItem, async (req, res) => {
+    console.log("In deleteItem");
     const itemProps: MyInventoryItemProps = {
-        title: req.body.title,
-        itemId: req.body.itemId,
-        owner: req.body.owner,
-        type: req.body.type,
-        count: req.body.count,
-        description: req.body.description
+        title: req.body.item.title,
+        itemId: req.body.item.itemId,
+        owner: req.body.sessionId,
+        type: req.body.item.type,
+        count: req.body.item.count,
+        description: req.body.item.description
     };
 
-    const itemToDelete = MyInventoryItem.createItem(itemProps);
-    console.log("In delete item");
-    logItem(itemToDelete);
+    await createNewItemProps(itemProps, sessionConnection).then((result) => {
+        const itemToDelete = MyInventoryItem.createItem(result.props);
+        console.log("In delete item");
+        logItem(itemToDelete);
 
-    const deleteItemController = createDeleteItemController(itemConnection);
+        const deleteItemController = createDeleteItemController(itemConnection);
 
-    deleteItemController.deleteItem(itemToDelete).then((value) => {
-        res.send("");
-    }).catch((reason: string) => {
-        res.send(reason);
+        deleteItemController.deleteItem(itemToDelete).then((value) => {
+            res.send("");
+        }).catch((reason: string) => {
+            res.send(reason);
+        });
+    }).catch(() => {
+        res.send("Couldn't get username from session");
     });
 });
 

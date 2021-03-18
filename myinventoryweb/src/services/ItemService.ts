@@ -67,13 +67,13 @@ class ItemService {
             const itemProp: MyInventoryItemProps = {
                 itemId: iItem.itemId,
                 title: iItem.title,
-                owner: iItem.owner,
                 type: iItem.type,
                 count: {
                     count: iItem.count, 
                     units: iItem.countUnit
                 },
-                description: iItem.description
+                description: iItem.description,
+                owner: ""
             };
             return MyInventoryItem.createItem(itemProp);
         });

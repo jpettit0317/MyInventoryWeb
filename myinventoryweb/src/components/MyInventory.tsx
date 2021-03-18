@@ -137,6 +137,7 @@ function MyInventory(): JSX.Element {
         console.log("Deleting item");
         logItem(selectedItem);
         setShouldOpenDeleteWarning(true);
+        console.log("The value of shouldOpenDeleteWarning is " + shouldOpenDeleteWarning);
     }
 
     function closeDeleteWarning() {
@@ -148,7 +149,16 @@ function MyInventory(): JSX.Element {
         console.log("Hit okay");
         closeDeleteWarning();
 
-        await deleteItemFromDB(FullApiURL.deleteItem, selectedItem).then((value) => {
+        const sessionId = getCookieValue("sessionId");
+
+        if (!sessionId) {
+            console.log("Session Id is null");
+            return;
+        } else {
+            console.log("Session id is " + sessionId!);
+        }
+
+        await deleteItemFromDB(FullApiURL.deleteItem, selectedItem, sessionId!).then((value) => {
             closeDeleteWarning();
             reloadPage();
         }).catch((reason: string) => {

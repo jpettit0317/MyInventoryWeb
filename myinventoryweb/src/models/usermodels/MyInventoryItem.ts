@@ -58,7 +58,6 @@ export function isCountValid(itemCount: ItemCount): boolean {
 
 export function isItemInvalid(item: MyInventoryItem): boolean {
     if (item.title === "") { return true; }
-    if (item.owner === "") { return true; }
     if (item.type === "") { return true; }
     if (!isCountValid(item.count)) { return true; }
 

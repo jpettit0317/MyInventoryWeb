@@ -9,6 +9,7 @@ import { createMyInventoryItemProps } from "../../props/MyInventoryItemProps";
 import ItemViewModel from "../../viewmodels/ItemFormViewModel";
 import ItemFormViewModelErrors from "../../typeDefs/ItemFormViewModelErrors";
 import ItemFormViewModel from "../../viewmodels/ItemFormViewModel";
+import getCookieValue from "../../utils/CookieUtils";
 
 function EditItemForm(props: EditItemFormProps) {
     const classes = useAddItemPageStyles();
@@ -52,9 +53,15 @@ function EditItemForm(props: EditItemFormProps) {
     }
 
     function onEditButtonClicked() {
+        const sessionId = getCookieValue("sessionId");
+
+        if (!sessionId) {
+            return;
+        }
+
         const itemToEditId = props.itemToEdit.itemId;
         const itemCountWithUnit: ItemCount = { count: itemCount, units: itemUnits };
-        const itemProps = createMyInventoryItemProps(itemTitle, itemToEditId, "jpettit0317",
+        const itemProps = createMyInventoryItemProps(itemTitle, itemToEditId, sessionId,
             itemType, itemCountWithUnit, itemDescription);
 
         const item = MyInventoryItem.createItem(itemProps);
