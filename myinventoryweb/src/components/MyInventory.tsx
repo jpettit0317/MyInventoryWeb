@@ -29,6 +29,7 @@ import DeleteItemWarning from "./deleteItem/DeleteItemWarning";
 import deleteItemFromDB from "../utils/DeleteItemUtils";
 import AddPageDialog from "./additem/AddPageDialog";
 import getCookieValue, { deleteCookie } from "../utils/CookieUtils";
+import LoggedInNavBar from "./navbars/LoggedInNavBar";
 
 function MyInventory(): JSX.Element {
     const classes = useMyInventoryStyles();
@@ -42,6 +43,7 @@ function MyInventory(): JSX.Element {
     const [shouldOpenDialog, setShouldOpenDialog] = useState(false);
     const [shouldOpenDeleteWarning, setShouldOpenDeleteWarning] = useState(false);
     const [shouldOpenAddItemDialog, setShouldOpenAddItemDialog] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     useEffect(() => {
         let mounted = true;
@@ -244,26 +246,59 @@ function MyInventory(): JSX.Element {
         setShouldRedirect(info.shouldRedirect);
     }
 
+    function loggedOutButtonPressed() {
+        console.log("Logged button was pressed");
+
+        logUserOut().then(result => {
+            setRedirect({shouldPush: false, shouldRedirect: true, destination: RoutePath.login});
+        }).catch((result: {result: boolean, reason: string}) => {
+            console.log("Failed to logout because " + result.reason);
+        });
+    }
+
+    async function logUserOut(): Promise<{result: boolean, reason: string}> {
+        return new Promise(async (resolve, reject) => {
+            const sessionId = getCookieValue("sessionId");
+
+            if (sessionId === null) {
+                reject({result: false, reason: "Couldn't find sessionId"});
+            } else {
+                await MyInventoryNetworkCallManager.deleteSession(sessionId!).then((result) => {
+                    resolve(result);
+                }).catch((reasonForRejection: {result: boolean, reason: string}) => {
+                    reject(reasonForRejection);
+                });
+            }
+        });
+    }
+
+    function onMenuButtonPressed() {
+        setIsMenuOpen(true);
+    }
+
     function renderItems(): JSX.Element {
         return (
-            <Container className={classes.cardGrid} maxWidth="md">
-                {shouldRedirect === true ? redirectToPage() : ""}
-                {shouldRenderEditDialog() && renderEditDialog()}
-                {shouldRenderDeleteWarning() && renderDeleteWarning()}
-                {shouldOpenAddItemDialog && renderAddItemDialog()}
-                <Grid container spacing={4}>
-                    <Grid item xs={12}>
-                        <Button size="small" color="primary" onClick={onAddItemButtonPressed}>
-                            Add Item
+            <div>
+                <LoggedInNavBar isMenuOpen={isMenuOpen} onLoggedOutPressed={loggedOutButtonPressed} onMenuButtonPressed={onMenuButtonPressed} />
+                <Container className={classes.cardGrid} maxWidth="md">
+                    {shouldRedirect === true ? redirectToPage() : ""}
+                    {shouldRenderEditDialog() && renderEditDialog()}
+                    {shouldRenderDeleteWarning() && renderDeleteWarning()}
+                    {shouldOpenAddItemDialog && renderAddItemDialog()}
+                    <Grid container spacing={4}>
+                        <Grid item xs={12}>
+                            <Button size="small" color="primary" onClick={onAddItemButtonPressed}>
+                                Add Item
                         </Button>
-                    </Grid>
-                    {items.map((item, index) => (
-                        <Grid item key={item.itemId} xs={12} md={4}>
-                            {displayCard({item, index})}
                         </Grid>
-                    ))}
-                </ Grid>
-            </Container>
+                        {items.map((item, index) => (
+                            <Grid item key={item.itemId} xs={12} md={4}>
+                                {displayCard({ item, index })}
+                            </Grid>
+                        ))}
+                    </ Grid>
+                </Container>
+            </div>
         );
     }
 

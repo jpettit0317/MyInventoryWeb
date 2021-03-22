@@ -22,7 +22,6 @@ function App() {
 
   return (
     <div>
-      <NavBar navBarTitle="MyInventory" />
       <BrowserRouter>
         <Switch>
           <Route
