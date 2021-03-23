@@ -5,6 +5,7 @@ interface MyInventoryItemCardProps {
     index: number;
     editItemCallBack: (index: number) => void;
     deleteItem: (item: MyInventoryItem) => void;
+    viewItem: (item: MyInventoryItem) => void;
 };
 
 export default MyInventoryItemCardProps;

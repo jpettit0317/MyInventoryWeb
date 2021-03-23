@@ -30,6 +30,7 @@ import deleteItemFromDB from "../utils/DeleteItemUtils";
 import AddPageDialog from "./additem/AddPageDialog";
 import getCookieValue, { deleteCookie } from "../utils/CookieUtils";
 import LoggedInNavBar from "./navbars/LoggedInNavBar";
+import ViewItemDialog from "./viewItem/ViewItemDialog";
 
 function MyInventory(): JSX.Element {
     const classes = useMyInventoryStyles();
@@ -43,6 +44,7 @@ function MyInventory(): JSX.Element {
     const [shouldOpenDialog, setShouldOpenDialog] = useState(false);
     const [shouldOpenDeleteWarning, setShouldOpenDeleteWarning] = useState(false);
     const [shouldOpenAddItemDialog, setShouldOpenAddItemDialog] = useState(false);
+    const [shouldOpenViewItemDialog, setShouldOpenViewItemDialog] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     useEffect(() => {
@@ -142,6 +144,17 @@ function MyInventory(): JSX.Element {
         console.log("The value of shouldOpenDeleteWarning is " + shouldOpenDeleteWarning);
     }
 
+    function viewItem(item: MyInventoryItem) {
+        console.log("Viewing item in MyInventory");
+
+        if (!isItemInvalid(item)) {
+            console.log("Item is valid");
+            setSelectedItem(item);
+            setShouldOpenViewItemDialog(true);
+            console.log("ShouldOPenViewItemDialog " + shouldOpenViewItemDialog);
+        }
+    }
+
     function closeDeleteWarning() {
         setShouldOpenDeleteWarning(false);
         clearSelectedItem();
@@ -236,6 +249,17 @@ function MyInventory(): JSX.Element {
         )
     }
 
+    function closeViewItemDialog() {
+        setShouldOpenViewItemDialog(false);
+    }
+
+    function renderViewItemDialog(): JSX.Element {
+        console.log("Rendering ViewItemDialog");
+        return (
+            <ViewItemDialog itemToView={selectedItem} isOpen={shouldOpenViewItemDialog} onClose={closeViewItemDialog} />
+        );
+    }
+
     function getEditItemUrl(): string {
         return `/editItem/${selectedItem.itemId}`;
     }
@@ -272,6 +296,13 @@ function MyInventory(): JSX.Element {
         });
     }
 
+    function shouldRenderViewItemDialog(): boolean {
+        console.log("Running shouldRenderViewItemDialog");
+        console.log("Is item valid" + !isItemInvalid(selectedItem));
+        console.log("ShouldOpenViewItemDialog " + shouldOpenViewItemDialog);
+        return !isItemInvalid(selectedItem) && shouldOpenViewItemDialog;
+    }
+
     function onMenuButtonPressed() {
         setIsMenuOpen(true);
     }
@@ -285,6 +316,7 @@ function MyInventory(): JSX.Element {
                     {shouldRenderEditDialog() && renderEditDialog()}
                     {shouldRenderDeleteWarning() && renderDeleteWarning()}
                     {shouldOpenAddItemDialog && renderAddItemDialog()}
+                    {shouldRenderViewItemDialog() === true ? renderViewItemDialog(): ""}
                     <Grid container spacing={4}>
                         <Grid item xs={12}>
                             <Button size="small" color="primary" onClick={onAddItemButtonPressed}>
@@ -313,6 +345,7 @@ function MyInventory(): JSX.Element {
                 editItemCallBack={onEditButtonPressed}
                 key={itemToDisplay.itemId}
                 deleteItem={deleteItem}
+                viewItem={viewItem}
             />
         );
     }

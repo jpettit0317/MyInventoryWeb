@@ -27,6 +27,12 @@ function MyInventoryItemCard(props: MyInventoryItemCardProps): JSX.Element {
         props.deleteItem(props.item);
     }
 
+    function onViewPressed() {
+        console.log("Viewing item\n");
+        logItem(props.item);
+        props.viewItem(props.item);
+    }
+
     return (
         <Card className={classes.card}>
             <CardContent className={classes.cardContent}>
@@ -41,7 +47,7 @@ function MyInventoryItemCard(props: MyInventoryItemCardProps): JSX.Element {
                 </Typography>
             </CardContent>
             <CardActions>
-                <Button size="small" color="primary">
+                <Button size="small" color="primary" onClick={onViewPressed}>
                     {buttonLabels.view}
                 </Button>
                 <Button size="small" color="primary" onClick={onEditPressed}>
