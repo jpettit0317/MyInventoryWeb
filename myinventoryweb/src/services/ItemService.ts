@@ -7,9 +7,11 @@ import { isItemInvalid } from "../models/usermodels/MyInventoryItem";
 class ItemService {
     private itemDB: Model<IItem>;
     readonly emptyItemErrorMessage = "Item has an empty required field";
+    private totalItemsPerPage: number;
 
-    constructor(newItemDB: Model<IItem>) {
+    constructor(newItemDB: Model<IItem>, newItemsPerPage: number = 9) {
         this.itemDB = newItemDB;
+        this.totalItemsPerPage = newItemsPerPage;
     }
 
     async addItem(item: MyInventoryItem): Promise<string> {
@@ -49,17 +51,59 @@ class ItemService {
         });
     }
 
-    getItemByOwner(owner: string): Promise<MyInventoryItem[]> {
+    getItemByOwner(owner: string, pageToLoad: number): Promise<{items: MyInventoryItem[], totalPages: number}> {
         return new Promise( (resolve, reject) => {
-            this.itemDB.find({owner: owner}).then((value) => {
-                console.log(`Found ${value.length} items`);
-                const items = this.convertIItemToMyInventoryItem(value);
-                resolve(items);
+            this.getItemsForPage(owner, pageToLoad).then((value) => {
+                this.getTotalNumberOfItems(owner).then((totalNumberOfItems) => {
+                    const totalPages = this.getNumberOfPages(totalNumberOfItems);
+                    resolve({items: value.items, totalPages: totalPages});
+                }).catch(() => {
+                    reject({items: [], totalItems: 0});
+                });
             }).catch((rejectReason) => {
                 console.log("Couldn't find items " + rejectReason);
-                reject([]);
+                reject({items: [], moreItems: false});
             });
         });
+    }
+
+    getTotalNumberOfItems(owner: string): Promise<number> {
+        return new Promise(async (resolve, reject) => {
+            this.itemDB.countDocuments({owner: owner}, (error, count) => {
+                resolve(count);
+            }).catch((error: string) => {
+                console.log("Couldn't get number of items because " + error);
+                reject(-1);
+            });
+        });
+    }
+
+    getItemsForPage(owner: string, pageNumber: number): Promise<{result: boolean, items: MyInventoryItem[]}> {
+        return new Promise(async (resolve, reject) => {
+            const numberOfItemsToSkip = this.skipNumberOfItems(pageNumber);
+
+            this.itemDB.find({owner: owner}).sort({title: "asc"}).skip(numberOfItemsToSkip)
+            .limit(this.totalItemsPerPage).then((iItems) => {
+                const inventoryItems = this.convertIItemToMyInventoryItem(iItems);
+                resolve({result: true, items: inventoryItems});
+            }).catch(() => {
+                reject({result: false, items: []});
+            });
+        });
+    }
+
+    private getNumberOfPages(totalItems: number) : number {
+        if (totalItems === 0) {
+            return 0;
+        } else if (totalItems > 0 && totalItems <= 9) {
+            return 1;
+        } else {
+            return Math.ceil((totalItems / this.totalItemsPerPage));
+        }
+    }
+
+    private skipNumberOfItems(pageNumber: number): number {
+        return (pageNumber - 1) * 9;
     }
 
     private convertIItemToMyInventoryItem(iItems: IItem[]): MyInventoryItem[] {

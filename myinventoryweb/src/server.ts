@@ -18,7 +18,7 @@ import SignUpController from "./controllers/SignUpController";
 import { Connection } from "mongoose";
 import { createPasswordConnection } from "./utils/PasswordServiceUtils";
 import UserPasswordInfo from "./interfaces/modelinterfaces/UserPasswordInfo";
-import { MyInventoryItemProps } from "./props/MyInventoryItemProps";
+import { createMyInventoryItemProps, MyInventoryItemProps } from "./props/MyInventoryItemProps";
 import MyInventoryItem, { logItem } from "./models/usermodels/MyInventoryItem";
 import AddItemController from "./controllers/AddItemController";
 import { createItemConnection } from "./utils/AddItemUtils";
@@ -102,29 +102,45 @@ app.post(ApiURL.addItem, async (req, res) => {
         description: req.body.description
     };
 
-    await createNewItemProps(itemProps, sessionConnection).then(async (result) => {
-        console.log("The props are " + JSON.stringify(result.props));
-        const addItemController = createAddItemController(result.props, itemConnection);
+    const otherItemProps = createItemProps(45);
 
-        await addItemController.addItem().then((addResult: string) => {
-            console.log("Resolving " + addResult);
-            res.send(addResult);
+    otherItemProps.forEach(async (itemProp) => {
+        const addItemController = createAddItemController(itemProp, itemConnection);
+
+        await addItemController.addItem().then(() => {
+            console.log("Adding item");
         }).catch((rejectReason: string) => {
             console.log("Rejecting " + rejectReason);
             res.send(rejectReason);
         });
-    }).catch(() => {
-        res.send(AddItemResult.failedToFetchUser);
     });
+
+    // await createNewItemProps(itemProps, sessionConnection).then(async (result) => {
+        
+    //     const addItemController = createAddItemController(result.props, itemConnection);
+
+    //     await addItemController.addItem().then((addResult: string) => {
+    //         console.log("Resolving " + addResult);
+    //         res.send(addResult);
+    //     }).catch((rejectReason: string) => {
+    //         console.log("Rejecting " + rejectReason);
+    //         res.send(rejectReason);
+    //     });
+    // }).catch(() => {
+    //     res.send(AddItemResult.failedToFetchUser);
+    // });
 });
 
 app.get(ApiURL.getItems, async (req, res) => {
     const owner = req.params.owner;
+    const pageToLoad = Number(req.params.pageNumber);
+
+    console.log("The page to load is " + pageToLoad);
 
     await getUsername(owner, sessionConnection).then(async (result) => {
         const getItemsController = createGetItemController(itemConnection);
 
-        await getItemsController.getItems(result.user).then((itemsAsString) => {
+        await getItemsController.getItems(result.user, pageToLoad).then((itemsAsString) => {
             res.send(itemsAsString);
         });
     }).catch(() => {
@@ -236,6 +252,16 @@ app.post(ApiURL.deleteItem, async (req, res) => {
         res.send("Couldn't get username from session");
     });
 });
+
+function createItemProps(numberOfItems: number): MyInventoryItemProps[] {
+    let itemProps: MyInventoryItemProps[] = [];
+
+    for (let i = 0; i < numberOfItems; i++) {
+        const prop = createMyInventoryItemProps(`Item${i}`, undefined, "j", "Other", {count: 1, units: "units"}, "");
+        itemProps.push(prop);
+    }
+    return itemProps;
+}
 
 function logUserInfo(userInfo: UserSignUpInfo) {
     console.log(`Uname: ${userInfo.username}`);

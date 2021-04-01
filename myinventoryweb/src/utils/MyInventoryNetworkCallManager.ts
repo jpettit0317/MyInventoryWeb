@@ -6,15 +6,16 @@ import { removeDoubleQuotesFromString } from "./StringUtil";
 
 class MyInventoryNetworkCallManager {
 
-    static getItemsForUser(user: string): Promise<string> {
+    static getItemsForUser(user: string, pageNumberToLoad: number = 1): Promise<{items: string, totalPages: number}> {
         return new Promise ( async (resolve, reject) => {
-            const url = MyInventoryNetworkCallManager.getItemUrl(user);
+            const url = MyInventoryNetworkCallManager.getItemUrl(user, pageNumberToLoad);
             await axios.get(url).then((data) => {
-                const dataAsJson = JSON.stringify(data.data);
-                resolve(dataAsJson);
+                const result: { data: string, totalPages: number } = JSON.parse(JSON.stringify(data.data));
+                console.log(`Items: ${result.data}, Total pages: ${result.totalPages}`);
+                resolve({items: result.data, totalPages: result.totalPages});
             }).catch((rejectionReason) => {
                 console.log("Failed to get data " + rejectionReason);
-                reject("");
+                reject({items: "", totalPages: 0});
             });
         });
     }
@@ -56,8 +57,8 @@ class MyInventoryNetworkCallManager {
         });
     }
 
-    private static getItemUrl(user: string): string {
-        return `http://localhost:4000/api/getItems/${user}`;
+    private static getItemUrl(user: string, pageNumberToLoad: number): string {
+        return `http://localhost:4000/api/getItems/${user}/${pageNumberToLoad}`;
     }
 
     private static getSessionUrl(sessionId: string): string {

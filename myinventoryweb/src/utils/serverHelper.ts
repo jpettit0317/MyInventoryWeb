@@ -62,7 +62,7 @@ function initSignUpController(userInfo: UserSignUpInfo,
 export function createAddItemController(newItemProps: MyInventoryItemProps, connection: Connection): AddItemController {
     const itemModel = createItemModel(connection);
     const newItem = MyInventoryItem.createItem(newItemProps);
-    const itemService = new ItemService(itemModel);
+    const itemService = new ItemService(itemModel, 9);
 
     return new AddItemController(newItem, itemService);
 }
@@ -97,7 +97,7 @@ export function createDeleteItemController(itemConnection: Connection): DeleteIt
 
 export function createGetItemController(connection: Connection): MyInventoryController {
     const itemModel = createItemModel(connection);
-    const itemService = new ItemService(itemModel);
+    const itemService = new ItemService(itemModel, 9);
     
     return new MyInventoryController(itemService);
 }

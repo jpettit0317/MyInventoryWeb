@@ -7,7 +7,8 @@ import {
     Button,
     makeStyles,
     Container,
-    Grid
+    Grid,
+    ButtonGroup
 } from "@material-ui/core/";
 import React, { useEffect, useState } from "react";
 import fs from "fs";
@@ -31,6 +32,10 @@ import AddPageDialog from "./additem/AddPageDialog";
 import getCookieValue, { deleteCookie } from "../utils/CookieUtils";
 import LoggedInNavBar from "./navbars/LoggedInNavBar";
 import ViewItemDialog from "./viewItem/ViewItemDialog";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { LoadingIndicator } from "./LoadingIndicator";
+import { ItemPageButtonGroup } from "./ButtonGroup";
+import JumpToPageDialog from "./getItems/JumpToPageDialog";
 
 function MyInventory(): JSX.Element {
     const classes = useMyInventoryStyles();
@@ -46,26 +51,34 @@ function MyInventory(): JSX.Element {
     const [shouldOpenAddItemDialog, setShouldOpenAddItemDialog] = useState(false);
     const [shouldOpenViewItemDialog, setShouldOpenViewItemDialog] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [currentPageNumber, setCurrentPageNumber] = useState(1);
+    const [totalNumberOfPages, setTotalNumberOfPages] = useState(1);
+    const [shouldOpenJumpToPageNumberDialog, setShouldOpenJumpDialog] = useState(false);
+
+    const fetchUserItems = async (sessionId: string, pageToLoad: number = 1) => {
+        await MyInventoryNetworkCallManager.getItemsForUser(sessionId, pageToLoad).then((value) => {
+            const retreivedItems: MyInventoryItem[] = JSON.parse(value.items);
+            console.log("Items are " + value.items);
+
+            setItems(retreivedItems);
+            setDidItemsLoad(true);
+            setTotalNumberOfPages(value.totalPages);
+        }).catch((reasonForRejection) => {
+            console.log(reasonForRejection);
+            setDidItemsLoad(true);
+        });
+    };
+
+    function fetchMoreData() {
+        const sessionId = getCookieValue("sessionId");
+        
+        if (sessionId !== null) {
+            const numberOfItemsToLoad = items.length + 6;
+            fetchUserItems(sessionId, numberOfItemsToLoad);
+        }
+    }
 
     useEffect(() => {
-        let mounted = true;
-
-        const fetchUserItems = async (sessionId: string) => {
-            await MyInventoryNetworkCallManager.getItemsForUser(sessionId).then((value) => {
-                const retreivedItems: MyInventoryItem[] = JSON.parse(value);
-                console.log("Items are " + value);
-                
-                if (!mounted) { return }
-                
-                setItems(retreivedItems);
-                setDidItemsLoad(true);
-
-            }).catch((reasonForRejection) => {
-                console.log(reasonForRejection);
-                setDidItemsLoad(true);
-            });
-        };
-
         async function checkForValidCookie(sessionId: string): Promise<{result: boolean, reason: string}> {
             return new Promise( async (resolve, reject) => {
                 await MyInventoryNetworkCallManager.checkForValidCookie(sessionId).then(result => {
@@ -83,7 +96,7 @@ function MyInventory(): JSX.Element {
         if (sessionId) {
             console.log("The session id is " + sessionId);
             checkForValidCookie(sessionId).then(() => {
-                fetchUserItems(sessionId);
+                fetchUserItems(sessionId, currentPageNumber);
             }).catch(() => {
                 console.log("Deleting session ");
                 MyInventoryNetworkCallManager.deleteSession(sessionId).then((result) => {
@@ -99,7 +112,7 @@ function MyInventory(): JSX.Element {
                 });
             });
         }
-    }, []);
+    }, [currentPageNumber]);
 
     function onEditButtonPressed(index: number) {
         console.log("Editing item at index " + index);
@@ -128,6 +141,10 @@ function MyInventory(): JSX.Element {
     }
 
     function closeAddDialogue() {
+        setShouldOpenAddItemDialog(false);
+    }
+
+    function addDialogAddButton() {
         setShouldOpenAddItemDialog(false);
         reloadPage();
     }
@@ -193,7 +210,7 @@ function MyInventory(): JSX.Element {
         return (
             <AddPageDialog 
                onClose={closeAddDialogue} 
-               onAdd={closeAddDialogue} 
+               onAdd={addDialogAddButton} 
                isOpen={shouldOpenAddItemDialog}
             />
         );
@@ -226,6 +243,28 @@ function MyInventory(): JSX.Element {
 
     function shouldRenderDeleteWarning(): boolean {
         return !isItemInvalid(selectedItem) && shouldOpenDeleteWarning;
+    }
+
+    function renderJumpDialog(): JSX.Element {
+        return (
+            <JumpToPageDialog 
+               isOpen={shouldOpenJumpToPageNumberDialog} 
+               okayPressed={jumpToPagePressed}
+               cancelPressed={cancelPressedOnJumpToPage}
+               totalNumberOfPages={totalNumberOfPages}
+            />
+        )
+    }
+
+    function cancelPressedOnJumpToPage() {
+        setShouldOpenJumpDialog(false);
+    }
+
+    function jumpToPagePressed(pageSelected: number) {
+        if (pageSelected > 0 && pageSelected <= totalNumberOfPages) {
+            setCurrentPageNumber(pageSelected);
+            setShouldOpenJumpDialog(false);
+        }
     }
 
     function renderEditDialog(): JSX.Element {
@@ -307,6 +346,52 @@ function MyInventory(): JSX.Element {
         setIsMenuOpen(true);
     }
 
+    function renderItemList(): JSX.Element {
+        const style = {
+            display: 'flex'
+        };
+
+        return (
+            <Grid container spacing={4}>
+                    <Grid item xs={12}>
+                        <Button size="small" color="primary" onClick={onAddItemButtonPressed}>
+                            Add Item
+                        </Button>
+                    </Grid>
+                {items.map((item, index) => (
+                   <Grid item key={item.itemId} xs={12} md={4}>
+                        {displayCard({ item, index })}
+                    </Grid>
+                ))}
+                <Grid container justify="center">
+                    <Grid item>
+                        {renderButtonGroup()}
+                    </Grid>
+                </Grid>
+            </ Grid>
+        );
+    }
+
+    function renderButtonGroup(): JSX.Element {
+        return (
+            <ItemPageButtonGroup totalPages={totalNumberOfPages} currentPage={currentPageNumber} buttonPressed={pageButtonPressed} displayRangePressed={rangeButtonPressed}/>            
+        );
+    }
+
+    function pageButtonPressed(index: number) {
+        if (index === -1) {
+            console.log("Range button was pressed");
+        } else {
+            console.log("The button is in pageButtonPressed " + index);
+            setCurrentPageNumber(index);
+        }
+    }
+
+    function rangeButtonPressed() {
+        console.log("Range button was pressed");
+        setShouldOpenJumpDialog(true);
+    }
+
     function renderItems(): JSX.Element {
         return (
             <div>
@@ -317,18 +402,8 @@ function MyInventory(): JSX.Element {
                     {shouldRenderDeleteWarning() && renderDeleteWarning()}
                     {shouldOpenAddItemDialog && renderAddItemDialog()}
                     {shouldRenderViewItemDialog() === true ? renderViewItemDialog(): ""}
-                    <Grid container spacing={4}>
-                        <Grid item xs={12}>
-                            <Button size="small" color="primary" onClick={onAddItemButtonPressed}>
-                                Add Item
-                        </Button>
-                        </Grid>
-                        {items.map((item, index) => (
-                            <Grid item key={item.itemId} xs={12} md={4}>
-                                {displayCard({ item, index })}
-                            </Grid>
-                        ))}
-                    </ Grid>
+                    {shouldOpenJumpToPageNumberDialog === true ? renderJumpDialog(): ""}
+                    {renderItemList()}
                 </Container>
             </div>
         );
@@ -355,8 +430,7 @@ function MyInventory(): JSX.Element {
         console.log("Redirect " + shouldRedirect);
         return (
             <div>
-                { shouldRedirect === true ? redirectToPage() : ""}
-                Loading...
+                <LoadingIndicator shouldRedirect={shouldRedirect} redirectToPage={redirectToPage} />
             </div>
         );
     }
