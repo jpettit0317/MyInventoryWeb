@@ -1,9 +1,14 @@
+require('dotenv').config();
 import { Model, Connection, createConnection } from 'mongoose';
 import ISession from '../interfaces/modelinterfaces/ISession';
 import sessionSchema from '../models/dbModels/SessionSchema';
+import { CollectionName, getCollectionName, getEnvironmentArg } from "./CollectionNameUtil";
+
+const environment = getEnvironmentArg();
+const collectionName = getCollectionName(environment, CollectionName.session);
 
 export const SessionDBInfo = {
-    collectionName: "testSessionDB",
+    collectionName: collectionName,
     modelName: "DBSession"
 };
 

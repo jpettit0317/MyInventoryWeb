@@ -102,33 +102,20 @@ app.post(ApiURL.addItem, async (req, res) => {
         description: req.body.description
     };
 
-    const otherItemProps = createItemProps(45);
+    await createNewItemProps(itemProps, sessionConnection).then(async (result) => {
+        
+        const addItemController = createAddItemController(result.props, itemConnection);
 
-    otherItemProps.forEach(async (itemProp) => {
-        const addItemController = createAddItemController(itemProp, itemConnection);
-
-        await addItemController.addItem().then(() => {
-            console.log("Adding item");
+        await addItemController.addItem().then((addResult: string) => {
+            console.log("Resolving " + addResult);
+            res.send(addResult);
         }).catch((rejectReason: string) => {
             console.log("Rejecting " + rejectReason);
             res.send(rejectReason);
         });
+    }).catch(() => {
+        res.send(AddItemResult.failedToFetchUser);
     });
-
-    // await createNewItemProps(itemProps, sessionConnection).then(async (result) => {
-        
-    //     const addItemController = createAddItemController(result.props, itemConnection);
-
-    //     await addItemController.addItem().then((addResult: string) => {
-    //         console.log("Resolving " + addResult);
-    //         res.send(addResult);
-    //     }).catch((rejectReason: string) => {
-    //         console.log("Rejecting " + rejectReason);
-    //         res.send(rejectReason);
-    //     });
-    // }).catch(() => {
-    //     res.send(AddItemResult.failedToFetchUser);
-    // });
 });
 
 app.get(ApiURL.getItems, async (req, res) => {
@@ -275,7 +262,7 @@ function logAddItem(item: MyInventoryItem) {
     console.log(`Item is ${item.asString()}`);
 }
 
-function logUserLoginInfo(userInfo: UserPasswordInfo) {
+export function logUserLoginInfo(userInfo: UserPasswordInfo) {
     console.log(`Username: ${userInfo.username} Password: ${userInfo.password}`);
 }
 

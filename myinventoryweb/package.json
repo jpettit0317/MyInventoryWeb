@@ -61,13 +61,15 @@
   },
   "scripts": {
     "start": "BROWSER='none' react-scripts start",
+    "start:env": "BROWSER='none' REACT_APP_ENVIRONMENT=dev react-scripts start",
     "build": "BROWSER='none' react-scripts build",
     "test": "jest",
     "eject": "BROWSER='none' react-scripts eject",
     "uitests": "jest --env=jsdom ./src/tests/uitests/*.tsx",
     "unittests": "jest ./src/tests/unittests/*/*.ts",
     "inttests": "jest ./src/tests/integrationtests/*.ts",
-    "startserver": "ts-node-dev ./src/server.ts",
+    "startserver:dev": "ts-node-dev ./src/server.ts dev",
+    "startserver:prod": "ts-node-dev ./src/server.ts prod",
     "buildProject": "tsc"
   },
   "eslintConfig": {

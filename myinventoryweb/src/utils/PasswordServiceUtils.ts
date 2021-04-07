@@ -1,9 +1,12 @@
 import { Model, Connection, createConnection } from 'mongoose';
 import IPasswordInfo from '../interfaces/modelinterfaces/IPasswordInfo';
 import userPasswordSchema from '../models/dbModels/UserPasswordSchema';
+import { CollectionName, getCollectionName, getEnvironmentArg } from "./CollectionNameUtil";
+
+const collectionName = getCollectionName(getEnvironmentArg(), CollectionName.password);
 
 export const UserPasswordDBInfo = {
-    collectionName: "testPasswordDB",
+    collectionName: collectionName,
     modelName: "DBPassword"
 };
 

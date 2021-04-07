@@ -1,9 +1,12 @@
 import { Connection, createConnection, Model } from "mongoose";
 import IItem from "../interfaces/modelinterfaces/IItem";
 import itemSchema from '../models/dbModels/ItemSchema';
+import { CollectionName, getCollectionName, getEnvironmentArg } from "./CollectionNameUtil";
+
+const collectionName = getCollectionName(getEnvironmentArg(), CollectionName.item);
 
 export const ItemCollectionInfo = {
-    collectionName: "testItemDB",
+    collectionName: collectionName,
     modelName: "DBItem"
 };
 

@@ -1,10 +1,14 @@
+require('dotenv').config();
 import { Model, Connection, createConnection } from 'mongoose';
 import IUserInfo from '../../interfaces/modelinterfaces/UserInfo';
 import userInfoSchema from '../dbModels/UserInfoSchema';
+import { CollectionName, Environment, getCollectionName, getEnvironmentArg } from "../../utils/CollectionNameUtil";
 
+const environment: Environment = getEnvironmentArg();
+const collectionName = getCollectionName(environment, CollectionName.user);
 
 export const UserCollectionInfo = {
-  collectionName: "testUserDB",
+  collectionName: collectionName,
   modelName: "DBUser"
 };
 

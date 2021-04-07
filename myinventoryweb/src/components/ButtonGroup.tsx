@@ -65,7 +65,7 @@ export function ItemPageButtonGroup(props: ButtonGroupProps) {
                 <ButtonGroup color="primary" aria-label="outlined primary button group">
                     {
                         visibleNumbers.map((value, index) => (
-                            <div>
+                            <div key={uuidv4()}>
                                 {renderButton(value)}
                             </div>
                         ))
@@ -100,11 +100,11 @@ export function ItemPageButtonGroup(props: ButtonGroupProps) {
     }
 
     function renderNormalButton(info: {buttonName: string, id: string}): JSX.Element {
-        return <Button key={uuidv4()} id={info.id} onClick={indexButtonPressed}>{info.buttonName}</Button>
+        return <Button key={uuidv4()} id={info.id} onClick={indexButtonPressed} disableElevation={false} >{info.buttonName}</Button>
     }
 
     function renderDisabledButton(info: {buttonName: string, id: string}): JSX.Element {
-        return <Button key={uuidv4()} id={info.id} onClick={indexButtonPressed} style={{backgroundColor: 'gray'}}>{info.buttonName}</Button>
+        return <Button key={uuidv4()} id={info.id} onClick={indexButtonPressed} disableElevation={false} style={{backgroundColor: 'gray'}}>{info.buttonName}</Button>
     }
 
     function getButtonRange(range: {min: number, max: number}): string[] {
