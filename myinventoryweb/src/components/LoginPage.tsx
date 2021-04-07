@@ -232,14 +232,11 @@ const LoginPage: React.FC<LoginPageProps> = props => {
                     >
                         Sign In
                     </Button>
-                    <Grid container>
+                    <Grid container justify="center">
                         <Grid item>
                             <Link to={RoutePath.signup}>
                                 {signUpLink}
                             </Link>
-                            <Link to={RoutePath.myinventory}>
-                                MyInventory
-                            </ Link> 
                         </Grid>
                     </Grid>
                 </form>
